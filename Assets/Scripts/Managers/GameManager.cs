@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class GameManager : MonoBehaviour
 {
@@ -39,6 +40,24 @@ public class GameManager : MonoBehaviour
         else if (_instance != this)
         {
             Destroy(gameObject);
+        }
+    }
+
+    public void PlayerSpawnTestButton_OnPlayerSpawn()
+    {
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            return;
+        }
+
+        PlayerFactory playerFactory = FindObjectOfType<PlayerFactory>();
+        if (playerFactory != null)
+        {
+            playerFactory.SpawnPlayerServerRpc();
+        }
+        else
+        {
+            Debug.LogError("PlayerFactory not found in the scene.");
         }
     }
 }

@@ -21,8 +21,8 @@ public class PlayerFactory : MonoBehaviour
         {
             Nickname = inputNickName+GameManager.Instance.GetNextPlayerNumber(),
             Job = inputPlayerJob,
-            Credibility = PlayeStatusData.MaxCredibility,
-            Spellpower = PlayeStatusData.MaxSpellpower,
+            Credibility = PlayerStatusData.MaxCredibility,
+            Spellpower = PlayerStatusData.MaxSpellpower,
             Gold = 0,
             MoveSpeed = 5f // 기본 이동 속도 설정
         };

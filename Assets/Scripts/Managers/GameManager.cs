@@ -1,12 +1,13 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     //현재 플레이어 수
-    private int playerCount = 0;
+    private NetworkVariable<int> playerCount = new NetworkVariable<int>(0);
     public int GetNextPlayerNumber()
     {
-        return playerCount++;
+        return playerCount.Value++;
     }
 
     //싱글톤 코드

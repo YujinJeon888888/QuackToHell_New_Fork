@@ -17,22 +17,30 @@ public class PlayerModel : NetworkBehaviour
 
     //상태에 따라 행동
     //상태 주입: State를 상속받은 클래스의 인스턴스를 주입받음
-    State _preState;
-    State _tempState;
-    State _curState;
+    State preState;
+    State tempState;
+    State curState;
 
     public void SetState(State state)
     {
-        _tempState = _curState;
-        _curState = state;
-        _preState = _tempState;
+        tempState = curState;
+        curState = state;
+        preState = tempState;
     }
-    public void Action()
+    public void ApplyStateChange()
     {
-        if (_preState != null)
+        if (preState != null)
         {
-            _preState.OnStateExit();
+            preState.OnStateExit();
         }
-        _curState.OnStateEnter();
+        curState.OnStateEnter();
+    }
+
+    private void Update()
+    {
+        if (curState != null)
+        {
+            curState.OnStateUpdate();
+        }
     }
 }

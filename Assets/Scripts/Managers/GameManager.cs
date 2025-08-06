@@ -1,15 +1,11 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    //현재 플레이어 수
-    private NetworkVariable<int> playerCount = new NetworkVariable<int>(0);
-    public int GetNextPlayerNumber()
-    {
-        return playerCount.Value++;
-    }
+
 
     //싱글톤 코드
     private static GameManager _instance;
@@ -43,21 +39,38 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void PlayerSpawnTestButton_OnPlayerSpawn()
+    private void Start()
     {
-        if (!NetworkManager.Singleton.IsServer)
-        {
-            return;
-        }
+        //persistent씬에서 시작해서 바로 홈씬으로 전환
+        SceneManager.LoadScene("HomeScene");
+    }
+
+    public void OnJoinAsClientButton()
+    {
+        // 클라이언트로 세션에 참여
+        NetworkManager.Singleton.StartClient();
+        PlayerSpawn();
+    }
+
+    public void OnJoinAsHostButton()
+    {
+        // 호스트(서버+클라이언트)로 세션 생성 및 참여
+        NetworkManager.Singleton.StartHost();
+        PlayerSpawn();
+    }
+
+    private void PlayerSpawn()
+    {
 
         PlayerFactory playerFactory = FindObjectOfType<PlayerFactory>();
         if (playerFactory != null)
         {
-            playerFactory.SpawnPlayerServerRpc();
+                playerFactory.SpawnPlayerServerRpc();
         }
         else
         {
             Debug.LogError("PlayerFactory not found in the scene.");
         }
     }
+
 }

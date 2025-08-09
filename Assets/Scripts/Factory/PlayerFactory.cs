@@ -37,7 +37,11 @@ public class PlayerFactory : NetworkBehaviour
         player.GetComponent<PlayerModel>().PlayerStatusData.Value = playerStatusData;
 
         // 상태 주입 (모두에게 명령)
-        player.GetComponent<PlayerModel>().EPlayerState.Value = PlayerState.Alive;
+        player.GetComponent<PlayerModel>().PlayerStateData.Value = new PlayerStateData
+        {
+            AliveState = PlayerAliveState.Alive,
+            AnimationState = PlayerAnimationState.Idle
+        };
     }
 
 

@@ -23,9 +23,9 @@ public class PlayerModel : NetworkBehaviour
     private void Start()
     {
         //playerstate값 바뀌면 SetStateByPlayerStateEnum() 실행
-        EPlayerState.OnValueChanged += (oldValue, newValue) =>
+        PlayerStateData.OnValueChanged += (oldValue, newValue) =>
         {
-            SetStateByPlayerStateEnum(newValue);
+            SetStateByPlayerStateEnum(newValue.AliveState, newValue.AnimationState);
             ApplyStateChange();
         };        
         
@@ -57,60 +57,96 @@ public class PlayerModel : NetworkBehaviour
 
     //상태에 따라 행동
     //상태 주입: State를 상속받은 클래스의 인스턴스를 주입받음
-    private NetworkVariable<PlayerState> _EplayerState = new NetworkVariable<PlayerState>(writePerm: NetworkVariableWritePermission.Server);
-    public NetworkVariable<PlayerState> EPlayerState
+    private NetworkVariable<PlayerStateData> _playerStateData = new NetworkVariable<PlayerStateData>(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<PlayerStateData> PlayerStateData
     {
-        get { return _EplayerState; }
+        get { return _playerStateData; }
         set
         {
-            _EplayerState = value;
+            _playerStateData = value;
         }
     }
 
-
-
-    private State preState;
-    private State tempState;
-    private State curState;
-
     
-    private void SetStateByPlayerStateEnum(PlayerState inputPlayerState)
+
+    private State preAliveState;
+    private State tempAliveState;
+    private State curAliveState;
+    private State preAnimationState;
+    private State tempAnimationState;
+    private State curAnimationState;
+
+
+    private void SetStateByPlayerStateEnum(PlayerAliveState inputPlayerAliveState = PlayerAliveState.Alive, PlayerAnimationState inputPlayerAnimationState = PlayerAnimationState.Idle)
     {
-        switch (inputPlayerState)
+        switch (inputPlayerAliveState)
         {
-            case PlayerState.Alive:
+            case PlayerAliveState.Alive:
                 SetState(gameObject.AddComponent<PlayerAliveState>());
                 break;
-            case PlayerState.Dead:
+            case PlayerAliveState.Dead:
                 SetState(gameObject.AddComponent<PlayerDeadState>());
                 break;
             default:
                 break;
         }
+        switch (inputPlayerAnimationState)
+        {
+            case PlayerAnimationState.Idle:
+                SetState(gameObject.AddComponent<PlayerIdleState>());
+                break;
+            case PlayerAnimationState.Walk:
+                SetState(gameObject.AddComponent<PlayerWalkState>());
+                break;
+        }
     }
 
-    private void SetState(State state)
+    private void SetAliveState(State state)
     {
-        tempState = curState;
-        curState = state;
-        preState = tempState;
+        tempAliveState = curAliveState;
+        curAliveState = state;
+        preAliveState = tempAliveState;
 
         //안 쓰는 컴포넌트 삭제
         foreach (var _state in GetComponents<State>())
         {
-            if (_state != curState && _state != preState)
+            if (_state != curAliveState && _state != preAliveState)
             {
                 Destroy(_state);
             }
         }
     }
+
+    private void SetAnimationState(State state)
+    {
+        tempAnimationState = curAnimationState;
+        curAnimationState = state;
+        preAnimationState = tempAnimationState;
+
+        //안 쓰는 컴포넌트 삭제
+        foreach (var _state in GetComponents<State>())
+        {
+            if (_state != curAnimationState && _state != preAnimationState)
+            {
+                Destroy(_state);
+            }
+        }
+    }
+
+
     private void ApplyStateChange()
     {
-        if (preState != null)
+        if (preAliveState != null)
         {
-            preState.OnStateExit();
+            preAliveState.OnStateExit();
         }
-        curState.OnStateEnter();
+        if (preAnimationState != null)
+        {
+            preAnimationState.OnStateExit();
+        }
+        
+        curAliveState.OnStateEnter();
+        curAnimationState.OnStateEnter();
     }
 
     

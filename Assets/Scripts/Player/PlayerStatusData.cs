@@ -5,10 +5,16 @@ using UnityEngine;
 /// <summary>  
 /// 플레이어 데이터 구조  
 /// </summary>  
-public enum PlayerState
+public enum PlayerAliveState
 {
     Alive,
     Dead
+}
+
+public enum PlayerAnimationState
+{
+    Idle,
+    Walk
 }
 
 public enum PlayerJob
@@ -17,7 +23,7 @@ public enum PlayerJob
 }
 
 [System.Serializable]
-public struct PlayerStatusData :INetworkSerializable
+public struct PlayerStatusData : INetworkSerializable
 {
     public const int MaxCredibility = 100;
     public const int MaxSpellpower = 100;
@@ -40,5 +46,18 @@ public struct PlayerStatusData :INetworkSerializable
         serializer.SerializeValue(ref Spellpower);
         serializer.SerializeValue(ref Gold);
         serializer.SerializeValue(ref MoveSpeed);
+    }
+}
+
+[System.Serializable]
+public struct PlayerStateData : INetworkSerializable
+{
+    public PlayerAliveState AliveState;
+    public PlayerAnimationState AnimationState;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref AliveState);
+        serializer.SerializeValue(ref AnimationState);
     }
 }

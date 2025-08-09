@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>  
 /// 플레이어 데이터 구조  
 /// </summary>  
-public enum PlayerAliveState
+public enum PlayerLivingState
 {
     Alive,
     Dead
@@ -52,7 +52,7 @@ public struct PlayerStatusData : INetworkSerializable
 [System.Serializable]
 public struct PlayerStateData : INetworkSerializable
 {
-    public PlayerAliveState AliveState;
+    public PlayerLivingState AliveState;
     public PlayerAnimationState AnimationState;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

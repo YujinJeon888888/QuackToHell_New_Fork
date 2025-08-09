@@ -9,11 +9,39 @@ using TMPro;
 /// </summary>
 public class PlayerView : NetworkBehaviour
 {
+    private TextMeshProUGUI nicknameText;
+    
     //닉네임
     private void Start()
     {
         var canvas = gameObject.GetComponentInChildren<Canvas>();
-        canvas.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = GetComponent<PlayerModel>().PlayerStatusData.Value.Nickname;
+        if (canvas != null)
+        {
+            nicknameText = canvas.GetComponentInChildren<TextMeshProUGUI>();
+        }
+        
+        // PlayerStatusData 전체의 OnValueChanged 이벤트 구독
+        var playerModel = GetComponent<PlayerModel>();
+        if (playerModel != null && playerModel.PlayerStatusData != null)
+        {
+            // 초기값 설정
+            UpdateNickname(playerModel.PlayerStatusData.Value.Nickname);
+            
+            // PlayerStatusData 변경 시 닉네임 업데이트
+            playerModel.PlayerStatusData.OnValueChanged += (previousValue, newValue) =>
+            {
+                UpdateNickname(newValue.Nickname);
+            };
+        }
+    }
+    
+    private void UpdateNickname(string nickname)
+    {
+        if (nicknameText != null)
+        {
+            nicknameText.text = nickname;
+            Debug.Log($"PlayerView: Nickname updated to '{nickname}' for {gameObject.name}");
+        }
     }
 
     //움직임

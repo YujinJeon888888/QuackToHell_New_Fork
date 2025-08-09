@@ -33,9 +33,13 @@ public class PlayerModel : NetworkBehaviour
 
     private void Update()
     {
-        if (curState != null)
+        if (curAliveState != null)
         {
-            curState.OnStateUpdate();
+            curAliveState.OnStateUpdate();
+        }
+        if (curAnimationState != null)
+        {
+            curAnimationState.OnStateUpdate();
         }
     }
 
@@ -77,15 +81,15 @@ public class PlayerModel : NetworkBehaviour
     private State curAnimationState;
 
 
-    private void SetStateByPlayerStateEnum(PlayerAliveState inputPlayerAliveState = PlayerAliveState.Alive, PlayerAnimationState inputPlayerAnimationState = PlayerAnimationState.Idle)
+    private void SetStateByPlayerStateEnum(PlayerLivingState inputPlayerAliveState = PlayerLivingState.Alive, PlayerAnimationState inputPlayerAnimationState = PlayerAnimationState.Idle)
     {
         switch (inputPlayerAliveState)
         {
-            case PlayerAliveState.Alive:
-                SetState(gameObject.AddComponent<PlayerAliveState>());
+            case PlayerLivingState.Alive:
+                SetAliveState(gameObject.AddComponent<PlayerAliveState>());
                 break;
-            case PlayerAliveState.Dead:
-                SetState(gameObject.AddComponent<PlayerDeadState>());
+            case PlayerLivingState.Dead:
+                SetAliveState(gameObject.AddComponent<PlayerDeadState>());
                 break;
             default:
                 break;
@@ -93,10 +97,10 @@ public class PlayerModel : NetworkBehaviour
         switch (inputPlayerAnimationState)
         {
             case PlayerAnimationState.Idle:
-                SetState(gameObject.AddComponent<PlayerIdleState>());
+                SetAnimationState(gameObject.AddComponent<PlayerIdleState>());
                 break;
             case PlayerAnimationState.Walk:
-                SetState(gameObject.AddComponent<PlayerWalkState>());
+                SetAnimationState(gameObject.AddComponent<PlayerWalkState>());
                 break;
         }
     }
@@ -149,19 +153,30 @@ public class PlayerModel : NetworkBehaviour
         curAnimationState.OnStateEnter();
     }
 
-    
+
 
     //움직임 로직 실행
-   
+
     [Rpc(SendTo.Server)]
     public void MovePlayerServerRpc(int inputXDirection, int inputYDirection)
     {
         //이동 : 1초당 움직임
         //방향 벡터
-        Debug.Log($"PlayerModel: Moving player with X: {inputXDirection}, Y: {inputYDirection}");
         UnityEngine.Vector2 direction = new UnityEngine.Vector2(inputXDirection, inputYDirection).normalized;
         playerRB.linearVelocity = direction * PlayerStatusData.Value.MoveSpeed;
-        
+        //상태전환: walk / idle
+        if (inputXDirection != 0 || inputYDirection != 0)
+        {
+            var newStateData = PlayerStateData.Value;
+            newStateData.AnimationState = PlayerAnimationState.Walk;
+            PlayerStateData.Value = newStateData;
+        }
+        else
+        {
+            var newStateData = PlayerStateData.Value;
+            newStateData.AnimationState = PlayerAnimationState.Idle;
+            PlayerStateData.Value = newStateData;
+        }
     }
 
 }

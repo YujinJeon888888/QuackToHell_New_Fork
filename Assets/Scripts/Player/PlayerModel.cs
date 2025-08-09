@@ -6,6 +6,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using static PlayerView;
+using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 /// <summary>
@@ -13,6 +14,21 @@ using Vector3 = UnityEngine.Vector3;
 /// </summary>
 public class PlayerModel : NetworkBehaviour
 {
+    private void Awake()
+    {
+        //플레이어 트랜스폼 가져오기
+        playerRB = gameObject.GetComponent<Rigidbody2D>();
+
+        //플레이어 닉네임 위한 세팅
+        var canvas = gameObject.GetComponentInChildren<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        var mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            canvas.worldCamera = mainCamera;
+        }
+    }
+
     private void Start()
     {
         //playerstate값 바뀌면 SetStateByPlayerStateEnum() 실행
@@ -22,8 +38,9 @@ public class PlayerModel : NetworkBehaviour
             ApplyStateChange();
         };
 
-        //플레이어 트랜스폼 가져오기
-        playerRB = gameObject.GetComponent<Rigidbody2D>();
+
+        
+        
     }
 
     private void Update()

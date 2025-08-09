@@ -29,7 +29,6 @@ public class PlayerPresenter : NetworkBehaviour
         OnMovementInputEventArgs onMovementInputEventArgs = (OnMovementInputEventArgs)e;
 
         //model에게 방향 이벤트 전달
-        UnityEngine.Debug.Log($"PlayerPresenter: Moving player with X: {onMovementInputEventArgs.XDirection}, Y: {onMovementInputEventArgs.YDirection}");
         playerModel.MovePlayerServerRpc(onMovementInputEventArgs.XDirection, onMovementInputEventArgs.YDirection);
     }
 }

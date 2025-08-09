@@ -31,13 +31,13 @@ public class PlayerFactory : NetworkBehaviour
             Job = inputPlayerJob,
             Credibility = PlayerStatusData.MaxCredibility,
             Spellpower = PlayerStatusData.MaxSpellpower,
-            Gold = 0,
-            MoveSpeed = 5f
+            Gold = 25,
+            MoveSpeed = 10f
         };
         player.GetComponent<PlayerModel>().PlayerStatusData.Value = playerStatusData;
 
         // 상태 주입 (모두에게 명령)
-        player.GetComponent<PlayerModel>().EPlayerState.Value = PlayerState.Idle;
+        player.GetComponent<PlayerModel>().EPlayerState.Value = PlayerState.Alive;
     }
 
 

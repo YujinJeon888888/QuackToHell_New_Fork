@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>  
 public enum PlayerState
 {
-    Idle,
+    Alive,
     Dead
 }
 

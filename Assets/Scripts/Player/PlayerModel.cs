@@ -18,15 +18,6 @@ public class PlayerModel : NetworkBehaviour
     {
         //플레이어 트랜스폼 가져오기
         playerRB = gameObject.GetComponent<Rigidbody2D>();
-
-        //플레이어 닉네임 위한 세팅
-        var canvas = gameObject.GetComponentInChildren<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        var mainCamera = Camera.main;
-        if (mainCamera != null)
-        {
-            canvas.worldCamera = mainCamera;
-        }
     }
 
     private void Start()
@@ -36,10 +27,7 @@ public class PlayerModel : NetworkBehaviour
         {
             SetStateByPlayerStateEnum(newValue);
             ApplyStateChange();
-        };
-
-
-        
+        };        
         
     }
 
@@ -90,8 +78,8 @@ public class PlayerModel : NetworkBehaviour
     {
         switch (inputPlayerState)
         {
-            case PlayerState.Idle:
-                SetState(gameObject.AddComponent<PlayerIdleState>());
+            case PlayerState.Alive:
+                SetState(gameObject.AddComponent<PlayerAliveState>());
                 break;
             case PlayerState.Dead:
                 SetState(gameObject.AddComponent<PlayerDeadState>());

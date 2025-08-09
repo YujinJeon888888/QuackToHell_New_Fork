@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerIdleState : State
+public class PlayerAliveState : State
 {
     public override void OnStateEnter()
     {

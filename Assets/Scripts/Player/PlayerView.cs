@@ -2,12 +2,21 @@ using System;
 using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
+using TMPro;
 
 /// <summary>
 /// 시각 및 입력 처리
 /// </summary>
 public class PlayerView : NetworkBehaviour
 {
+    //닉네임
+    private void Start()
+    {
+        var canvas = gameObject.GetComponentInChildren<Canvas>();
+        canvas.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = GetComponent<PlayerModel>().PlayerStatusData.Value.Nickname;
+    }
+
+    //움직임
     public EventHandler OnMovementInput;
 
     public class OnMovementInputEventArgs: EventArgs{
@@ -30,8 +39,6 @@ public class PlayerView : NetworkBehaviour
             yDirection = inputYDirection;
         }
     }
-
-
 
     private void Update()
     {

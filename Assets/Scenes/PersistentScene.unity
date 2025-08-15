@@ -505,6 +505,10 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 4101244762
       objectReference: {fileID: 0}
+    - target: {fileID: 5682512095123133807, guid: 9f6122dd5c6be354ba5712774de7a16e, type: 3}
+      propertyPath: playerSpawnPoint
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7854205432963406137, guid: 9f6122dd5c6be354ba5712774de7a16e, type: 3}
       propertyPath: m_Name
       value: FactoryManager

@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1469992845
+  GlobalObjectIdHash: 4101244762
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -72,4 +72,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   playerPrefab: {fileID: 6392237839669725171, guid: 2ecefbf144423af4a80cfe43ee599582, type: 3}
-  playerSpawnPoint: {fileID: 0}
+  playerSpawnPoint: {fileID: 2387837586390922979, guid: 2ecefbf144423af4a80cfe43ee599582, type: 3}

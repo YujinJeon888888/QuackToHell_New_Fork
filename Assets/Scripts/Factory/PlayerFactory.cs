@@ -11,8 +11,13 @@ public class PlayerFactory : NetworkBehaviour
 {
     //플레이어스폰
     public GameObject playerPrefab;
-    public Transform playerSpawnPoint;
-
+    
+    private Transform playerSpawnPoint;
+    private void Start()
+    {
+        transform.position = new Vector3(0, 0, 0);
+        playerSpawnPoint = transform;
+    }
 
 
     [ServerRpc(RequireOwnership = false)]
@@ -42,6 +47,9 @@ public class PlayerFactory : NetworkBehaviour
             AliveState = PlayerLivingState.Alive,
             AnimationState = PlayerAnimationState.Idle
         };
+
+        //싱글톤 처리 - 플레이어
+        DontDestroyOnLoad(player);
     }
 
 

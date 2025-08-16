@@ -23,6 +23,7 @@ public struct CardDef
     public int BaseCost;
     public string DescriptionKey;
     public string ImagePathKey;
+    public int AmountOfCardItem;
 }
 
 [Serializable] public struct StringRow { public string Key; public string KR; public string EN; }

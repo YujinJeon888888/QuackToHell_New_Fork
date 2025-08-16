@@ -846,6 +846,53 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!1 &1379268666
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1379268668}
+  - component: {fileID: 1379268667}
+  m_Layer: 0
+  m_Name: CardDataView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1379268667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379268666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 874141e1f476a36409ec99a107432c49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardCsvUrl: https://docs.google.com/spreadsheets/d/e/2PACX-1vSgwnbjYDcZWcgXBBo1DjYeQMkLdZb2XMxyqWqoSY1-uEYOcByb86fWiMv1QHf2VPp5S9pelS_Ioz5D/pub?gid=0&single=true&output=csv
+  stringCsvUrl: https://docs.google.com/spreadsheets/d/e/2PACX-1vS5_GjFBmzcqQxa8Z2_WCjxvO_uFnCUo5KEqB2DxqsWlBQsArP0t9GOpPmFVjJ0nLOGEG9iOb4sa-Wy/pub?gid=0&single=true&output=csv
+  resourceCsvUrl: https://docs.google.com/spreadsheets/d/e/2PACX-1vTD0Ax8qLCqNXtM4XtX0GPVHJw9H2YwTH_KYY8wdZfco3hQDh45_ZI0mvBEwxGhtu5GH8SnAKUV00Z2/pub?gid=0&single=true&output=csv
+--- !u!4 &1379268668
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379268666}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 98.28687, y: 98.96684, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1390765175
 GameObject:
   m_ObjectHideFlags: 0
@@ -1463,3 +1510,4 @@ SceneRoots:
   - {fileID: 993361436}
   - {fileID: 479828375}
   - {fileID: 1390765176}
+  - {fileID: 1379268668}

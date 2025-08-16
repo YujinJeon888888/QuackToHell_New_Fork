@@ -38,22 +38,14 @@ public class PlayerView : NetworkBehaviour
 
     public class OnMovementInputEventArgs: EventArgs{
         
-        private int xDirection;
-        private int yDirection;
+        public int XDirection { get; private set; }
+        public int YDirection { get; private set; }
         
-        public int XDirection
-        {
-            get { return xDirection; }
-        }
-        public int YDirection
-        {
-            get { return yDirection; }
-        }
 
         public OnMovementInputEventArgs(int inputXDirection, int inputYDirection)
         {
-            xDirection = inputXDirection;
-            yDirection = inputYDirection;
+            XDirection = inputXDirection;
+            YDirection = inputYDirection;
         }
     }
 

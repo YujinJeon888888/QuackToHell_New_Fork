@@ -1,0 +1,83 @@
+using UnityEngine;
+using Unity.Netcode;
+
+public class CardItemModel : NetworkBehaviour
+{
+    #region 데이터
+    //데이터
+    private NetworkVariable<CardDef> _cardDefData = new NetworkVariable<CardDef>(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<CardDef> CardDefData
+    {
+        get { return _cardDefData; }
+        set
+        {
+            _cardDefData = value;
+        }
+    }
+    private NetworkVariable<CardItemStatusData> _cardItemStatusData = new NetworkVariable<CardItemStatusData>(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<CardItemStatusData> CardItemStatusData
+    {
+        get { return _cardItemStatusData; }
+        set
+        {
+            _cardItemStatusData = value;
+        }
+    }
+    #endregion
+    #region 카드 상태
+
+    private State preState;
+    private State tempState;
+    private State curState;
+
+
+    private void SetStateByCardItemStateEnum(CardItemState inputCardItemState = CardItemState.None)
+    {
+        switch (inputCardItemState)
+        {
+            case CardItemState.None:
+                SetState(gameObject.AddComponent<CardItemNoneState>());
+                break;
+            case CardItemState.Sold:
+                SetState(gameObject.AddComponent<CardItemSoldState>());
+                break;
+            default:
+                break;
+        }
+        
+    }
+
+    private void SetState(State state)
+    {
+        tempState = curState;
+        curState = state;
+        preState = tempState;
+
+        //안 쓰는 컴포넌트 삭제
+        foreach (var _state in GetComponents<State>())
+        {
+            if (_state != curState && _state != preState)
+            {
+                Destroy(_state);
+            }
+        }
+    }
+
+    
+
+    private void ApplyStateChange()
+    {
+        if (preState != null)
+        {
+            preState.OnStateExit();
+        }
+        if (preState != null)
+        {
+            preState.OnStateExit();
+        }
+        
+        curState.OnStateEnter();
+    }
+    #endregion
+
+}

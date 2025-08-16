@@ -8,7 +8,7 @@ using System.Collections.Generic;
 public class LobbyController : NetworkBehaviour
 {
     [Header("Card System")]
-    [SerializeField] private CardCatalogBootstrap cardCatalogBootstrap;
+    [SerializeField] private CardDataView cardDataView;
     
     private bool isCardDataLoaded = false;
     private bool isGameReadyToStart = false;
@@ -27,11 +27,11 @@ public class LobbyController : NetworkBehaviour
     private void Start()
     {
         // 씬에서 해당 타입의 오브젝트를 찾아서 참조 설정
-        cardCatalogBootstrap = FindObjectOfType<CardCatalogBootstrap>();
+        cardDataView = FindObjectOfType<CardDataView>();
         
-        if (cardCatalogBootstrap == null)
+        if (cardDataView == null)
         {
-            Debug.LogError("[LobbyController] CardCatalogBootstrap을 씬에서 찾을 수 없습니다.");
+            Debug.LogError("[LobbyController] CardDataView을 씬에서 찾을 수 없습니다.");
         }
 
         // 카드 데이터 로딩 시작
@@ -47,12 +47,15 @@ public class LobbyController : NetworkBehaviour
         
         try
         {
-            // CardCatalogRepository가 준비될 때까지 대기
-            await CardCatalogRepository.Instance.WhenReadyAsync();
+            // CardDataView의 Presenter가 준비될 때까지 대기
+            while (CardDataView.Presenter == null)
+            {
+                await Task.Yield();
+            }
             
             // 카드 데이터 로딩 완료
             isCardDataLoaded = true;
-            Debug.Log($"[LobbyController] 카드 데이터 로딩 완료. 총 {CardCatalogRepository.Instance.AsReadOnly().Count}개 카드");
+            Debug.Log($"[LobbyController] 카드 데이터 로딩 완료. 총 {CardDataView.Presenter.CardCount}개 카드");
             
             // 2. 데이터 불러오는 거 끝나면, 게임 시작 가능하게 만든다
             SetGameReadyToStart();
@@ -83,11 +86,11 @@ public class LobbyController : NetworkBehaviour
     /// </summary>
     private void PassCardDataToFactory()
     {
-        // 싱글톤 인스턴스를 통해 CardItemFactory에 접근
-        if (CardItemFactory.Instance != null)
+        // CardDataView의 Presenter를 통해 CardItemFactory에 접근
+        if (CardItemFactory.Instance != null && CardDataView.Presenter != null)
         {
             // 모든 카드 데이터를 딕셔너리로 가져와서 팩토리에 전달
-            var allCardData = CardCatalogRepository.Instance.AsReadOnly();
+            var allCardData = CardDataView.Presenter.Cards;
             
             // 팩토리에 카드 데이터 전달
             CardItemFactory.Instance.SetCardData(allCardData);
@@ -96,7 +99,7 @@ public class LobbyController : NetworkBehaviour
         }
         else
         {
-            Debug.LogWarning("[LobbyController] CardItemFactory 싱글톤 인스턴스를 찾을 수 없습니다.");
+            Debug.LogWarning("[LobbyController] CardItemFactory 싱글톤 인스턴스 또는 CardDataView.Presenter를 찾을 수 없습니다.");
         }
     }
 
@@ -174,5 +177,4 @@ public class LobbyController : NetworkBehaviour
             Debug.LogError("PlayerFactory not found in the scene.");
         }
     }
-
 }

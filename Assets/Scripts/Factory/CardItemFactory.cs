@@ -7,7 +7,8 @@ using System.Collections.Generic;
 /// </summary>
 public class CardItemFactory : MonoBehaviour
 {
-     //싱글톤로직
+    #region 싱글톤 코드
+    //싱글톤로직
     private static CardItemFactory _instance;
     public static CardItemFactory Instance
     {
@@ -39,9 +40,15 @@ public class CardItemFactory : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    #endregion
 
-    
-    // 카드 데이터
+    #region 게임 내 전체 카드 Definition (DeckManager에게 생성해도 되냐고 물어본 뒤, 생성)
+
+    /// <summary>
+    /// 카드 데이터 딕셔너리
+    /// </summary>
+    /// <param name="key">CardId - 카드의 고유 식별자</param>
+    /// <param name="value">CardDef - 카드 definition 구조체</param>
     private Dictionary<int, CardDef> cardDataDictionary;
     private bool isCardDataInitialized = false;
 
@@ -60,7 +67,7 @@ public class CardItemFactory : MonoBehaviour
         // 딕셔너리를 복사하여 저장
         cardDataDictionary = new Dictionary<int, CardDef>(cardData);
         isCardDataInitialized = true;
-        
+
         Debug.Log($"[CardItemFactory] {cardDataDictionary.Count}개 카드 데이터 설정 완료");
     }
 
@@ -106,4 +113,14 @@ public class CardItemFactory : MonoBehaviour
     /// 카드 데이터 개수
     /// </summary>
     public int CardDataCount => isCardDataInitialized && cardDataDictionary != null ? cardDataDictionary.Count : 0;
+    #endregion
+
+    #region 카드 아이템 생성
+    public GameObject cardItemForSalePrefab;
+    public void CreateCardForSale(int cardId, RectTransform transform)
+    {
+        //TODO: 카드 아이디에 맞게 데이터 넣기.
+        Instantiate(cardItemForSalePrefab, transform);
+    }
+    #endregion
 }

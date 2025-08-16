@@ -209,7 +209,7 @@ GameObject:
   - component: {fileID: 950484033}
   - component: {fileID: 950484032}
   - component: {fileID: 950484031}
-  - component: {fileID: 950484030}
+  - component: {fileID: 950484035}
   - component: {fileID: 950484034}
   m_Layer: 0
   m_Name: NetworkManager
@@ -218,18 +218,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &950484030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 950484029}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a010192451dd12940bf2518a9c4ee268, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &950484031
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,10 +314,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 950484029}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50c14e01622deba4aac386b7f6a1e0ad, type: 3}
+  m_Script: {fileID: 11500000, guid: 75de814c98f4d7848bdf366fe2e08dd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controllerPrefab: {fileID: 5946744688189302311, guid: 2578d81229bcc284c8d368202dd001df, type: 3}
+  controllerPrefab: {fileID: 4344602964138184379, guid: 2578d81229bcc284c8d368202dd001df, type: 3}
+--- !u!114 &950484035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 950484029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb09ed472b316624893775adba80c69b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &976466518
 GameObject:
   m_ObjectHideFlags: 0
@@ -413,9 +413,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1018851368}
-        m_TargetAssemblyTypeName: QuickNetUI, Assembly-CSharp
-        m_MethodName: StartClient
+      - m_Target: {fileID: 1018851370}
+        m_TargetAssemblyTypeName: QuickNetView, Assembly-CSharp
+        m_MethodName: OnClickClient
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -472,29 +472,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1018851369}
-  - component: {fileID: 1018851368}
+  - component: {fileID: 1018851370}
   m_Layer: 0
-  m_Name: QuickNetUI
+  m_Name: QuickNetView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1018851368
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1018851367}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a09a0802dab6e50439cf1a272ed12b6f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  firstScene: VillageScene
-  address: 127.0.0.1
-  port: 7777
 --- !u!4 &1018851369
 Transform:
   m_ObjectHideFlags: 0
@@ -510,6 +495,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1018851370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018851367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83cd4795fc6369d459375af5d5d0caca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mode: 0
+  firstScene: VillageScene
+  address: 127.0.0.1
+  port: 7777
+  sceneName: VillageScene
 --- !u!1 &1235454194
 GameObject:
   m_ObjectHideFlags: 0
@@ -1014,9 +1016,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1018851368}
-        m_TargetAssemblyTypeName: QuickNetUI, Assembly-CSharp
-        m_MethodName: StartHost
+      - m_Target: {fileID: 1018851370}
+        m_TargetAssemblyTypeName: QuickNetView, Assembly-CSharp
+        m_MethodName: OnClickHost
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

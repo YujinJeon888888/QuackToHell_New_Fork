@@ -27,8 +27,9 @@ public class PlayerModel : NetworkBehaviour
         {
             SetStateByPlayerStateEnum(newValue.AliveState, newValue.AnimationState);
             ApplyStateChange();
-        };        
+        };
         
+
     }
 
     private void Update()
@@ -43,11 +44,37 @@ public class PlayerModel : NetworkBehaviour
         }
     }
 
-
+    #region 플레이어 움직임
     //플레이어 위치
     private Rigidbody2D playerRB;
+    //움직임 로직 실행
 
-    //속성값
+    [Rpc(SendTo.Server)]
+    public void MovePlayerServerRpc(int inputXDirection, int inputYDirection)
+    {
+        //이동 : 1초당 움직임
+        //방향 벡터
+        UnityEngine.Vector2 direction = new UnityEngine.Vector2(inputXDirection, inputYDirection).normalized;
+        playerRB.linearVelocity = direction * PlayerStatusData.Value.MoveSpeed;
+        //상태전환: walk / idle
+        if (inputXDirection != 0 || inputYDirection != 0)
+        {
+            var newStateData = PlayerStateData.Value;
+            newStateData.AnimationState = PlayerAnimationState.Walk;
+            PlayerStateData.Value = newStateData;
+        }
+        else
+        {
+            var newStateData = PlayerStateData.Value;
+            newStateData.AnimationState = PlayerAnimationState.Idle;
+            PlayerStateData.Value = newStateData;
+        }
+    }
+    #endregion
+
+
+    #region 플레이어 데이터
+    //플레이어 데이터
     private NetworkVariable<PlayerStatusData> _playerStatusData = new NetworkVariable<PlayerStatusData>(
         writePerm: NetworkVariableWritePermission.Server
     );
@@ -70,8 +97,9 @@ public class PlayerModel : NetworkBehaviour
             _playerStateData = value;
         }
     }
+    #endregion
 
-    
+    #region 플레이어 상태
 
     private State preAliveState;
     private State tempAliveState;
@@ -152,31 +180,8 @@ public class PlayerModel : NetworkBehaviour
         curAliveState.OnStateEnter();
         curAnimationState.OnStateEnter();
     }
+    #endregion
 
 
-
-    //움직임 로직 실행
-
-    [Rpc(SendTo.Server)]
-    public void MovePlayerServerRpc(int inputXDirection, int inputYDirection)
-    {
-        //이동 : 1초당 움직임
-        //방향 벡터
-        UnityEngine.Vector2 direction = new UnityEngine.Vector2(inputXDirection, inputYDirection).normalized;
-        playerRB.linearVelocity = direction * PlayerStatusData.Value.MoveSpeed;
-        //상태전환: walk / idle
-        if (inputXDirection != 0 || inputYDirection != 0)
-        {
-            var newStateData = PlayerStateData.Value;
-            newStateData.AnimationState = PlayerAnimationState.Walk;
-            PlayerStateData.Value = newStateData;
-        }
-        else
-        {
-            var newStateData = PlayerStateData.Value;
-            newStateData.AnimationState = PlayerAnimationState.Idle;
-            PlayerStateData.Value = newStateData;
-        }
-    }
-
+    
 }

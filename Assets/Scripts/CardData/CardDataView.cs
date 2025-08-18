@@ -1,8 +1,9 @@
 using UnityEngine;
 using System.Threading;
 using System.Threading.Tasks;
+using Unity.Netcode;
 
-public sealed class CardDataView : MonoBehaviour
+public sealed class CardDataView : NetworkBehaviour
 {
     [Header("Google Sheets CSV URLs")]
     [SerializeField] string cardCsvUrl;     // Card_Table
@@ -12,12 +13,19 @@ public sealed class CardDataView : MonoBehaviour
     public static CardDataPresenter Presenter { get; private set; }
     CancellationTokenSource _cts;
 
-    async void Start()
+    // 호스트가 접속하면, 데이터 로드 시작
+    public override async void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+        if (!IsHost)
+        {
+            return;
+        }
+        
 #if UNITY_2023_1_OR_NEWER
         var exists = Object.FindObjectsByType<CardDataView>(FindObjectsSortMode.None);
 #else
-    var exists = Object.FindObjectsOfType<CardDataView>();
+        var exists = Object.FindObjectsOfType<CardDataView>();
 #endif
         if (exists.Length > 1)
         {
@@ -29,6 +37,7 @@ public sealed class CardDataView : MonoBehaviour
         _cts = new CancellationTokenSource();
 
         Presenter ??= new CardDataPresenter();
+
         try
         {
             await Presenter.PreloadAsync(cardCsvUrl, stringCsvUrl, resourceCsvUrl, _cts.Token);
@@ -39,6 +48,7 @@ public sealed class CardDataView : MonoBehaviour
             Debug.LogError($"[CardData] init failed: {ex.Message}");
         }
     }
+ 
 
     void OnDestroy() { _cts?.Cancel(); _cts?.Dispose(); }
 }

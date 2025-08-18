@@ -29,7 +29,6 @@ public class PlayerView : NetworkBehaviour
         if (nicknameText != null)
         {
             nicknameText.text = nickname;
-            Debug.Log($"PlayerView: Nickname updated to '{nickname}' for {gameObject.name}");
         }
     }
 

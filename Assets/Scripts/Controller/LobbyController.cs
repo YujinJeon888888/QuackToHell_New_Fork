@@ -4,110 +4,48 @@ using Unity.Netcode;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-//TODO: 나중에 수정하기
 public class LobbyController : NetworkBehaviour
 {
-    [Header("Card System")]
-    [SerializeField] private CardDataView cardDataView;
-    
+    #region 카드데이터 로드
+
     private bool isCardDataLoaded = false;
-    private bool isGameReadyToStart = false;
 
-    /// <summary>
-    /// 카드 데이터 로딩 상태 확인: 읽기 전용 프로퍼티
-    /// </summary>
-    public bool IsCardDataLoaded => isCardDataLoaded;
-
-    /// <summary>
-    /// 게임 시작 준비 상태 확인: 읽기 전용 프로퍼티
-    /// </summary>
-    public bool IsGameReadyToStart => isGameReadyToStart;
-
-
-    private void Start()
+    public override async void OnNetworkSpawn()
     {
-        // 씬에서 해당 타입의 오브젝트를 찾아서 참조 설정
-        cardDataView = FindObjectOfType<CardDataView>();
-        
-        if (cardDataView == null)
+        base.OnNetworkSpawn();
+        //호스트만 데이터 로드
+        if (!IsHost)
         {
-            Debug.LogError("[LobbyController] CardDataView을 씬에서 찾을 수 없습니다.");
+            return;
         }
 
-        // 카드 데이터 로딩 시작
-        LoadCardData();        
-    }
-
-    /// <summary>
-    /// 1. 카드 데이터를 불러온다 (카드구조체)
-    /// </summary>
-    private async void LoadCardData()
-    {
-        Debug.Log("[LobbyController] 카드 데이터 로딩 시작...");
-        
-        try
+        // CardDataView가 초기화될 때까지 대기
+        while (CardDataView.Presenter == null)
         {
-            // CardDataView의 Presenter가 준비될 때까지 대기
-            while (CardDataView.Presenter == null)
-            {
-                await Task.Yield();
-            }
-            
-            // 카드 데이터 로딩 완료
-            isCardDataLoaded = true;
-            Debug.Log($"[LobbyController] 카드 데이터 로딩 완료. 총 {CardDataView.Presenter.CardCount}개 카드");
-            
-            // 2. 데이터 불러오는 거 끝나면, 게임 시작 가능하게 만든다
-            SetGameReadyToStart();
-            
-            // 3. 팩토리한테 데이터(카드구조체)를 넘겨준다
-            PassCardDataToFactory();
+            await Task.Yield();
         }
-        catch (System.Exception ex)
+
+        // 데이터 로딩 완료까지 대기
+        await CardDataView.Presenter.WhenReadyAsync();
+
+        // 이제 안전하게 데이터 사용
+        Debug.Log($"로드된 카드 수: {CardDataView.Presenter.CardCount}");
+
+        foreach (var value in CardDataView.Presenter.Cards)
         {
-            Debug.LogError($"[LobbyController] 카드 데이터 로딩 실패: {ex.Message}");
+            Debug.Log($"{value.Value.CardID}의 총량: {value.Value.AmountOfCardItem}");
         }
     }
+ 
+    #endregion
 
-    /// <summary>
-    /// 2. 데이터 불러오는 거 끝나면, 게임 시작 가능하게 만든다
-    /// </summary>
-    private void SetGameReadyToStart()
-    {
-        isGameReadyToStart = true;
-        Debug.Log("[LobbyController] 카드 데이터 로딩 완료!");
-        
-        // UI 업데이트나 다른 게임 시작 관련 로직을 여기에 추가할 수 있습니다
-        // 예: 시작 버튼 활성화, 로딩 화면 숨기기 등
-    }
-
-    /// <summary>
-    /// 3. 팩토리한테 데이터(카드구조체)를 넘겨준다
-    /// </summary>
-    private void PassCardDataToFactory()
-    {
-        // CardDataView의 Presenter를 통해 CardItemFactory에 접근
-        if (CardItemFactory.Instance != null && CardDataView.Presenter != null)
-        {
-            // 모든 카드 데이터를 딕셔너리로 가져와서 팩토리에 전달
-            var allCardData = CardDataView.Presenter.Cards;
-            
-            // 팩토리에 카드 데이터 전달
-            CardItemFactory.Instance.SetCardData(allCardData);
-            
-            Debug.Log($"[LobbyController] 팩토리에 {allCardData.Count}개 카드 데이터 전달 완료");
-        }
-        else
-        {
-            Debug.LogWarning("[LobbyController] CardItemFactory 싱글톤 인스턴스 또는 CardDataView.Presenter를 찾을 수 없습니다.");
-        }
-    }
+    #region 게임 버튼
 
     public void OnJoinAsClientButton()
     {
         // 네트워크 연결 완료 이벤트 구독
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        
+
         // 클라이언트로 세션에 참여
         NetworkManager.Singleton.StartClient();
     }
@@ -116,32 +54,63 @@ public class LobbyController : NetworkBehaviour
     {
         // 네트워크 연결 완료 이벤트 구독
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        
+
         // 호스트(서버+클라이언트)로 세션 생성 및 참여
         NetworkManager.Singleton.StartHost();
     }
-    
+
     public void OnStartGameButton()
     {
-        if (!IsOwner)//default 오너: 호스트
+        //호스트만 게임 시작 가능
+        if (!IsOwner)
         {
             Debug.LogError("Only the owner can start the game!");
             return;
         }
 
-        // 카드 데이터가 로드되지 않았거나 게임 시작 준비가 안 되었다면 시작 불가
-        if (!isCardDataLoaded || !isGameReadyToStart)
+        // 2명 미만이면 시작 못 함
+        if(NetworkManager.Singleton.ConnectedClientsList.Count < 2)
         {
-            Debug.LogWarning("[LobbyController] 게임 시작 준비가 완료되지 않았습니다.");
             return;
         }
 
-        //클라이언트가 2명 이상이면, 마을 씬 이동: invoke를 3초뒤에
-        if (NetworkManager.Singleton.ConnectedClientsList.Count >= 2)
+        if (IsHost)
         {
-            LoadVillageSceneServerRpc();
+            //호스트가 클라이언트에게 데이터 전달: 멀티캐스트
+            IReadOnlyDictionary<int, CardDef> cardData = CardDataView.Presenter.Cards;
+            //직렬화 가능 타입으로 변환
+            CardKeyValuePair[] cardKeyValuePairs = new CardKeyValuePair[cardData.Count];
+            int index = 0;
+            foreach (var card in cardData)
+            {
+                cardKeyValuePairs[index] = new CardKeyValuePair { Key = card.Key, Value = card.Value };
+                index++;
+            }
+            LoadCardDataClientRpc(cardKeyValuePairs);
         }
+
+       
+        //본인 데이터가 모두 초기화되면, 씬 이동.
+        LoadVillageSceneServerRpc();
     }
+
+    [ClientRpc]
+    private void LoadCardDataClientRpc( CardKeyValuePair[] cardKeyValuePairs)
+    {
+        LoadCardData(cardKeyValuePairs);
+    }
+
+    private async void LoadCardData( CardKeyValuePair[] cardKeyValuePairs)
+    {
+        //DeckManager에게 데이터 전달
+        await DeckManager.Instance.SetTotalCardsOnGame(cardKeyValuePairs);
+        //CardItemFactory에게 데이터 전달
+        await CardItemFactory.Instance.SetCardData(cardKeyValuePairs);
+
+        isCardDataLoaded = true;
+    }
+
+
 
     private void OnClientConnected(ulong clientId)
     {
@@ -157,7 +126,7 @@ public class LobbyController : NetworkBehaviour
 
 
     }
-    
+
     [ServerRpc]
     private void LoadVillageSceneServerRpc()
     {
@@ -177,4 +146,5 @@ public class LobbyController : NetworkBehaviour
             Debug.LogError("PlayerFactory not found in the scene.");
         }
     }
+    #endregion
 }

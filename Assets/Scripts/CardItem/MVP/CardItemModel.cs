@@ -5,8 +5,8 @@ public class CardItemModel : NetworkBehaviour
 {
     #region 데이터
     //데이터
-    private NetworkVariable<CardDef> _cardDefData = new NetworkVariable<CardDef>(writePerm: NetworkVariableWritePermission.Server);
-    public NetworkVariable<CardDef> CardDefData
+    private CardDef _cardDefData = new();
+    public CardDef CardDefData
     {
         get { return _cardDefData; }
         set
@@ -14,8 +14,8 @@ public class CardItemModel : NetworkBehaviour
             _cardDefData = value;
         }
     }
-    private NetworkVariable<CardItemStatusData> _cardItemStatusData = new NetworkVariable<CardItemStatusData>(writePerm: NetworkVariableWritePermission.Server);
-    public NetworkVariable<CardItemStatusData> CardItemStatusData
+    private CardItemStatusData _cardItemStatusData = new();
+    public CardItemStatusData CardItemStatusData
     {
         get { return _cardItemStatusData; }
         set

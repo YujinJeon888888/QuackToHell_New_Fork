@@ -20,8 +20,8 @@ public class CardItemPresenter : MonoBehaviour
 
     private void CardItemView_OnPurchaseClicked(ulong inputClientId)
     {        
-        int cardID = cardItemModel.CardItemStatusData.Value.CardID;
-        int cardPrice = cardItemModel.CardItemStatusData.Value.Price;
+        int cardID = cardItemModel.CardItemStatusData.CardID;
+        int cardPrice = cardItemModel.CardItemStatusData.Price;
         // TODO:CardShop에게 카드 구매 요청 : 카드 아이디, 플레이어 아이디, 카드 가격 보내주기
         //cardShopModel.TryPurchaseCard(cardID, inputClientId, cardPrice);
     }

@@ -8,7 +8,19 @@ using Unity.Netcode;
 public enum TierEnum { None = 0, Common = 1, Rare = 2, Special = 3 }
 public enum TypeEnum { None = 0, Attack = 1, Defense = 2, Special = 3 }
 
-[Serializable]
+// 딕셔너리의 Key와 Value 한 쌍을 담을 컨테이너 struct
+public struct CardKeyValuePair : INetworkSerializable
+{
+    public int Key;
+    public CardDef Value;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Key);
+        serializer.SerializeValue(ref Value);
+    }
+}
+
 public struct CardDef : INetworkSerializable
 {
     public int CardID;
@@ -45,28 +57,21 @@ public struct CardDef : INetworkSerializable
     }
 }
 
-[System.Serializable]
+
 public enum CardItemState
 {
     None,
     Sold,
 }
 
-[System.Serializable]
-public struct CardItemStatusData : INetworkSerializable
+
+public struct CardItemStatusData 
 {
     public int CardItemID;
     public int CardID;
     public int Price;
     public int Cost;
 
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref CardItemID);
-        serializer.SerializeValue(ref CardID);
-        serializer.SerializeValue(ref Price);
-        serializer.SerializeValue(ref Cost);
-    }
 }
 
 [Serializable] public struct StringRow { public string Key; public string KR; public string EN; }

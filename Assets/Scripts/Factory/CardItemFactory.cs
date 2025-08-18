@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System;
 
 /// <summary>
 /// 카드 아이템 생성 팩토리
@@ -42,85 +44,74 @@ public class CardItemFactory : MonoBehaviour
     }
     #endregion
 
-    #region 게임 내 전체 카드 Definition (DeckManager에게 생성해도 되냐고 물어본 뒤, 생성)
+    #region 생성할 카드 청사진(Definition)
+    private readonly Dictionary<int, CardDef> _cards = new();
+    public IReadOnlyDictionary<int, CardDef> Cards => _cards;
 
-    /// <summary>
-    /// 카드 데이터 딕셔너리
-    /// </summary>
-    /// <param name="key">CardId - 카드의 고유 식별자</param>
-    /// <param name="value">CardDef - 카드 definition 구조체</param>
-    private Dictionary<int, CardDef> cardDataDictionary;
-    private bool isCardDataInitialized = false;
-
-    /// <summary>
-    /// LobbyController에서 전달받은 카드 데이터를 설정
-    /// </summary>
-    /// <param name="cardData">카드 데이터 딕셔너리</param>
-    public void SetCardData(IReadOnlyDictionary<int, CardDef> cardData)
+    public async Task SetCardData(CardKeyValuePair[] cardKeyValuePairs)
     {
-        if (cardData == null)
+        if (cardKeyValuePairs == null)
         {
             Debug.LogError("[CardItemFactory] 전달받은 카드 데이터가 null입니다.");
             return;
         }
 
-        // 딕셔너리를 복사하여 저장
-        cardDataDictionary = new Dictionary<int, CardDef>(cardData);
-        isCardDataInitialized = true;
-
-        Debug.Log($"[CardItemFactory] {cardDataDictionary.Count}개 카드 데이터 설정 완료");
-    }
-
-    /// <summary>
-    /// 특정 ID의 카드 데이터 가져오기
-    /// </summary>
-    /// <param name="cardId">카드 ID</param>
-    /// <param name="cardDef">카드 데이터 (출력 매개변수)</param>
-    /// <returns>성공 여부</returns>
-    public bool TryGetCardData(int cardId, out CardDef cardDef)
-    {
-        if (!isCardDataInitialized || cardDataDictionary == null)
+        foreach (var card in cardKeyValuePairs)
         {
-            cardDef = default;
-            Debug.LogWarning("[CardItemFactory] 카드 데이터가 아직 초기화되지 않았습니다.");
-            return false;
+            _cards[card.Key] = card.Value;
         }
-
-        return cardDataDictionary.TryGetValue(cardId, out cardDef);
-    }
-
-    /// <summary>
-    /// 모든 카드 데이터 가져오기
-    /// </summary>
-    /// <returns>카드 데이터 딕셔너리 (읽기 전용)</returns>
-    public IReadOnlyDictionary<int, CardDef> GetAllCardData()
-    {
-        if (!isCardDataInitialized || cardDataDictionary == null)
+        Debug.Log($"[CardItemFactory] {_cards.Count}개 카드 데이터 설정 완료");
+        foreach (var card in _cards)
         {
-            Debug.LogWarning("[CardItemFactory] 카드 데이터가 아직 초기화되지 않았습니다.");
-            return new Dictionary<int, CardDef>();
+            Debug.Log($"[CardItemFactory] CardID: {card.Key}, CardNameKey: {card.Value.CardNameKey}");
         }
-
-        return cardDataDictionary;
     }
 
-    /// <summary>
-    /// 카드 데이터 초기화 상태 확인
-    /// </summary>
-    public bool IsCardDataInitialized => isCardDataInitialized;
-
-    /// <summary>
-    /// 카드 데이터 개수
-    /// </summary>
-    public int CardDataCount => isCardDataInitialized && cardDataDictionary != null ? cardDataDictionary.Count : 0;
     #endregion
 
     #region 카드 아이템 생성
     public GameObject cardItemForSalePrefab;
-    public void CreateCardForSale(int cardId, RectTransform transform)
+
+    public void CreateCardForSale(int cardId, Vector3 inputPosition)
     {
-        //TODO: 카드 아이디에 맞게 데이터 넣기.
-        Instantiate(cardItemForSalePrefab, transform);
+        #region 유효한 요청인지 확인
+        //카드 ID가 존재하는지 확인
+        if (!_cards.ContainsKey(cardId))
+        {
+            Debug.LogError($"[CardItemFactory] 카드 아이디에 맞는 카드 데이터가 없습니다. CardID: {cardId}");
+            return;
+        }
+        #endregion
+
+        //프리팹 생성
+        GameObject cardItemForSale = Instantiate(cardItemForSalePrefab, inputPosition, Quaternion.identity);
+        //주입할 데이터 생성
+        CardDef cardDef = _cards[cardId];
+        CardItemStatusData cardItemStatusData = new CardItemStatusData
+        {
+            CardItemID = cardId,
+            CardID = cardId,
+            //TODO: 가격 및 발언력 설정
+            Price = cardDef.BasePrice,
+            Cost = cardDef.BaseCost
+        };
+
+        //데이터 주입
+        cardItemForSale.GetComponent<CardItemModel>().CardDefData = cardDef;
+        cardItemForSale.GetComponent<CardItemModel>().CardItemStatusData = cardItemStatusData;
+        Debug.Log($"[CardItemFactory] 카드 아이템 생성 완료. CardID: {cardId}, CardName: {cardDef.CardNameKey}, Price: {cardItemStatusData.Price}, Cost: {cardItemStatusData.Cost}, CardItemID: {cardItemStatusData.CardItemID}");
+        //캔버스 부착
+        cardItemForSale.transform.SetParent(GameObject.Find("CardShopCanvas").transform);
+        cardItemForSale.transform.localScale = Vector3.one;
+        cardItemForSale.transform.localPosition = inputPosition;
+    }
+    #endregion
+
+    #region 테스트용 코드
+    [Obsolete("카드 생성되는지 테스트하는 버튼")]
+    public void OnTestCreateCardForSaleButton()
+    {
+        CardItemFactory.Instance.CreateCardForSale(20000, Vector3.zero);
     }
     #endregion
 }

@@ -73,7 +73,8 @@ public sealed class CardDataPresenter
             iUni = IDX("IsUniqueCard"), iSell = IDX("IsSellableCard"),
             iClass = IDX("UsableClass"), iMap = IDX("Map_Restriction"),
             iPrice = IDX("BasePrice"), iCost = IDX("BaseCost"),
-            iDesc = IDX("DescriptionKey"), iImg = IDX("ImagePathKey");
+            iDesc = IDX("DescriptionKey"), iImg = IDX("ImagePathKey"),
+            iAmount = IDX("AmountOfCardItem");
 
         for (int r = 1; r < rows.Count; r++)
         {
@@ -97,6 +98,7 @@ public sealed class CardDataPresenter
                 BaseCost = CardDataModel.ToInt(S(c, iCost)),
                 DescriptionKey = S(c, iDesc),
                 ImagePathKey = S(c, iImg),
+                AmountOfCardItem = CardDataModel.ToInt(S(c, iAmount)),
             });
         }
         return list;

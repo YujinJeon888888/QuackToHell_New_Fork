@@ -2,13 +2,26 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Unity.Netcode;
 
 #region Data Structs (기획서 타입 반영)
 public enum TierEnum { None = 0, Common = 1, Rare = 2, Special = 3 }
 public enum TypeEnum { None = 0, Attack = 1, Defense = 2, Special = 3 }
 
-[Serializable]
-public struct CardDef
+// 딕셔너리의 Key와 Value 한 쌍을 담을 컨테이너 struct
+public struct CardKeyValuePair : INetworkSerializable
+{
+    public int Key;
+    public CardDef Value;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Key);
+        serializer.SerializeValue(ref Value);
+    }
+}
+
+public struct CardDef : INetworkSerializable
 {
     public int CardID;
     public string CardNameKey;
@@ -24,6 +37,41 @@ public struct CardDef
     public string DescriptionKey;
     public string ImagePathKey;
     public int AmountOfCardItem;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref CardID);
+        serializer.SerializeValue(ref CardNameKey);
+        serializer.SerializeValue(ref Tier);
+        serializer.SerializeValue(ref Type);
+        serializer.SerializeValue(ref SubType);
+        serializer.SerializeValue(ref IsUniqueCard);
+        serializer.SerializeValue(ref IsSellableCard);
+        serializer.SerializeValue(ref UsableClass);
+        serializer.SerializeValue(ref Map_Restriction);
+        serializer.SerializeValue(ref BasePrice);
+        serializer.SerializeValue(ref BaseCost);
+        serializer.SerializeValue(ref DescriptionKey);
+        serializer.SerializeValue(ref ImagePathKey);
+        serializer.SerializeValue(ref AmountOfCardItem);
+    }
+}
+
+
+public enum CardItemState
+{
+    None,
+    Sold,
+}
+
+
+public struct CardItemStatusData 
+{
+    public int CardItemID;
+    public int CardID;
+    public int Price;
+    public int Cost;
+
 }
 
 [Serializable] public struct StringRow { public string Key; public string KR; public string EN; }
@@ -43,7 +91,7 @@ public struct CardDisplay
 }
 #endregion
 
-public sealed class CardDataModel
+public sealed class CardDataModel : NetworkBehaviour
 {
     readonly Dictionary<int, CardDef> _cards = new();
     readonly Dictionary<string, StringRow> _strings = new();

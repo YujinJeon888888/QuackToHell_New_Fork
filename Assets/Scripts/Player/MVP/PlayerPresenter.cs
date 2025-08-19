@@ -21,12 +21,11 @@ public class PlayerPresenter : NetworkBehaviour
         playerView.OnMovementInput += PlayerView_OnMovementInput;
 
         //닉네임
+        // 초기값 설정
+        playerView.UpdateNickname(playerModel.PlayerStatusData.Value.Nickname);
         // PlayerStatusData 전체의 OnValueChanged 이벤트 구독
         if (playerModel != null && playerModel.PlayerStatusData != null)
         {
-            // 초기값 설정
-            playerView.UpdateNickname(playerModel.PlayerStatusData.Value.Nickname);
-            
             // PlayerStatusData 변경 시 닉네임 업데이트
             playerModel.PlayerStatusData.OnValueChanged += (previousValue, newValue) =>
             {

@@ -482,6 +482,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  cardItemNameTxt: {fileID: 2698032815079274698}
+  cardTypeTxt: {fileID: 4446941896142116319}
+  descriptionTxt: {fileID: 6894155157118792542}
+  costTxt: {fileID: 2385185658266794945}
 --- !u!114 &8548098312666017670
 MonoBehaviour:
   m_ObjectHideFlags: 0

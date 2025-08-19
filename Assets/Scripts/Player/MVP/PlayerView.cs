@@ -3,25 +3,68 @@ using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 시각 및 입력 처리
 /// </summary>
 public class PlayerView : NetworkBehaviour
 {
-    private TextMeshProUGUI nicknameText;
-    private PlayerModel playerModel;
-    //닉네임
     private void Start()
     {
-        playerModel = gameObject.GetComponent<PlayerModel>();
         var canvas = gameObject.GetComponentInChildren<Canvas>();
         if (canvas != null)
         {
             nicknameText = canvas.GetComponentInChildren<TextMeshProUGUI>();
         }
-        
+
+        // 씬 로드 이벤트 구독
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        if (IsOwner)
+        {
+            SetupLocalCamera();
+        }
     }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (IsOwner)
+        {
+            SetupLocalCamera();
+        }
+    }
+    #region 카메라
+    private Camera localCamera = null;
+
+    private void SetupLocalCamera()
+    {
+        // 기존 메인 카메라 비활성화
+        if (Camera.main != null) GameObject.Find("Main Camera").SetActive(false);
+
+        // 로컬 카메라 생성 및 플레이어 하위로 설정
+        if (localCamera == null)
+        {
+            GameObject cameraObj = new GameObject("LocalCamera");
+            localCamera = cameraObj.AddComponent<Camera>();
+            cameraObj.transform.SetParent(transform);
+            cameraObj.transform.localPosition = new Vector3(0, 0, -10);
+            cameraObj.layer = LayerMask.NameToLayer("Player");
+            cameraObj.tag = "MainCamera";
+        }
+        //씬 내에서 Canvas인 오브젝트 모두 찾아서, 렌더모드가 Camera라면 내 카메라 넣어주기
+        Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+        foreach (Canvas canvas in canvases)
+        {
+            canvas.worldCamera = localCamera;
+        }
+    }
+
+    #endregion
+
+    #region 닉네임
+    private TextMeshProUGUI nicknameText;
+   
+    //닉네임
     
     public void UpdateNickname(string nickname)
     {
@@ -30,6 +73,9 @@ public class PlayerView : NetworkBehaviour
             nicknameText.text = nickname;
         }
     }
+    #endregion
+
+    #region 움직임
 
     //움직임
     public EventHandler OnMovementInput;
@@ -84,4 +130,5 @@ public class PlayerView : NetworkBehaviour
             OnMovementInput?.Invoke(this, new OnMovementInputEventArgs(0, 0));
         }
     }
+    #endregion
 }

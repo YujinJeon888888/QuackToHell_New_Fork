@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2883489578918842774}
   - component: {fileID: 5682512095123133807}
   m_Layer: 0
-  m_Name: FactoryManager
+  m_Name: PlayerFactoryManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

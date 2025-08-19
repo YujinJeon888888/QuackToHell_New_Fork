@@ -20,8 +20,7 @@ public class PlayerView : NetworkBehaviour
         {
             nicknameText = canvas.GetComponentInChildren<TextMeshProUGUI>();
         }
-        // 초기값 설정
-        UpdateNickname(playerModel.PlayerStatusData.Value.Nickname);
+        
     }
     
     public void UpdateNickname(string nickname)

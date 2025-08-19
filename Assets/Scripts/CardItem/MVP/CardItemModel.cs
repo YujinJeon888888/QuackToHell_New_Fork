@@ -6,21 +6,31 @@ public class CardItemModel : NetworkBehaviour
     #region 데이터
     //데이터
     private CardDef _cardDefData = new();
+    public event System.Action<CardDef> OnCardDefDataChanged;
     public CardDef CardDefData
     {
         get { return _cardDefData; }
         set
         {
-            _cardDefData = value;
+            if (!_cardDefData.Equals(value))
+            {
+                _cardDefData = value;
+                OnCardDefDataChanged?.Invoke(_cardDefData);
+            }
         }
     }
     private CardItemStatusData _cardItemStatusData = new();
+    public event System.Action<CardItemStatusData> OnCardItemStatusDataChanged;
     public CardItemStatusData CardItemStatusData
     {
         get { return _cardItemStatusData; }
         set
         {
-            _cardItemStatusData = value;
+            if (!_cardItemStatusData.Equals(value))
+            {
+                _cardItemStatusData = value;
+                OnCardItemStatusDataChanged?.Invoke(_cardItemStatusData);
+            }
         }
     }
     #endregion

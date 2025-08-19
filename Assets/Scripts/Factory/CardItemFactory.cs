@@ -97,8 +97,9 @@ public class CardItemFactory : MonoBehaviour
         };
 
         //데이터 주입
-        cardItemForSale.GetComponent<CardItemModel>().CardDefData = cardDef;
-        cardItemForSale.GetComponent<CardItemModel>().CardItemStatusData = cardItemStatusData;
+        var cardItemModel = cardItemForSale.GetComponentInChildren<CardItemModel>();
+        cardItemModel.CardDefData = cardDef;
+        cardItemModel.CardItemStatusData = cardItemStatusData;
         Debug.Log($"[CardItemFactory] 카드 아이템 생성 완료. CardID: {cardId}, CardName: {cardDef.CardNameKey}, Price: {cardItemStatusData.Price}, Cost: {cardItemStatusData.Cost}, CardItemID: {cardItemStatusData.CardItemID}");
         //캔버스 부착
         cardItemForSale.transform.SetParent(GameObject.Find("CardShopCanvas").transform);

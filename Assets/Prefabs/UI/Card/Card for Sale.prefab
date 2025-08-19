@@ -9,9 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1419213623791637677}
-  - component: {fileID: 7210347304040847789}
-  - component: {fileID: 2994469118477504094}
-  - component: {fileID: 6646193914484597264}
   m_Layer: 5
   m_Name: Card for Sale
   m_TagString: Untagged
@@ -40,44 +37,6 @@ RectTransform:
   m_AnchoredPosition: {x: 378, y: -33}
   m_SizeDelta: {x: 200, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &7210347304040847789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3226483900878045010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e82ce93ac75c2eb4dac5e79b033ed210, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
---- !u!114 &2994469118477504094
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3226483900878045010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c1a16655310a33478562500bb402006, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
---- !u!114 &6646193914484597264
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3226483900878045010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abf4d45029427c44e9f2b20a1df03146, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8548941522039011669
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,6 +191,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Card (0)
       objectReference: {fileID: 0}
+    - target: {fileID: 3257859905255282202, guid: 779af19041c2f42d781d45c0d87c8afd, type: 3}
+      propertyPath: priceTxtForSale
+      value: 
+      objectReference: {fileID: 1093450044694808723}
     - target: {fileID: 7622547791679172160, guid: 779af19041c2f42d781d45c0d87c8afd, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

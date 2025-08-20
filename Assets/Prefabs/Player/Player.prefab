@@ -342,6 +342,7 @@ GameObject:
   - component: {fileID: -9128371651074946859}
   - component: {fileID: -7064969181952296292}
   - component: {fileID: 5667651071140909388}
+  - component: {fileID: 8152440620057098562}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -558,6 +559,19 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
+--- !u!114 &8152440620057098562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6392237839669725171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8d215a614650774da3a903988cad036, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &9157300098359662370
 GameObject:
   m_ObjectHideFlags: 0

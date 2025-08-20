@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public interface ICardShopView
 {
-    event Action<int, ulong, int> OnClickBuy; // (cardId, clientId, cardPrice)
+    event Action<InventoryCard, ulong> OnClickBuy; // (card, clientId)
     void ShowLoading(bool on);
     void ShowResult(bool success, string msg);
 }
@@ -13,22 +13,23 @@ public interface ICardShopView
 public sealed class CardShopView : MonoBehaviour, ICardShopView
 {
     [Header("UI")]
-    [SerializeField] private Button buyButton;
+    //[SerializeField] private Button buyButton;
     [SerializeField] private TMP_InputField cardIdInput;
     [SerializeField] private TMP_InputField priceInput;
     [SerializeField] private TMP_Text statusText;
 
-    public event Action<int, ulong, int> OnClickBuy;
+    public event Action<InventoryCard, ulong> OnClickBuy;
 
     private void Awake()
     {
-        buyButton.onClick.AddListener(() =>
+        /*buyButton.onClick.AddListener(() =>
         {
-            int.TryParse(cardIdInput.text, out var cardId);
-            int.TryParse(priceInput.text, out var price);
-            // clientId는 로컬 클라의 ClientId를 전달 or Presenter가 채워줄 수도 있음
-            OnClickBuy?.Invoke(cardId, 0UL, price);
-        });
+            if (int.TryParse(cardIdInput.text, out var cardId))
+            {
+                var card = new InventoryCard { CardID = cardId };
+                OnClickBuy?.Invoke(card, 0UL);
+            }
+        });*/
     }
 
     public void ShowLoading(bool on)

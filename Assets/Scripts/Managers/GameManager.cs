@@ -64,31 +64,12 @@ public class GameManager : NetworkBehaviour
     [ServerRpc]
     public void DeductPlayerGoldServerRpc(ulong clientId, int amount)
     {
-        // 서버에서만 실행
-        if (IsHost)
-        {
-            // NetworkManager로 정확한 클라이언트의 PlayerObject 찾기
-            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client))
-            {
-                var player = client.PlayerObject.GetComponent<PlayerModel>();
-                if (player != null)
-                {
-                    // 해당 클라이언트의 골드 차감
-                    var newStatusData = player.PlayerStatusData.Value;
-                    newStatusData.Gold -= amount;
-                    player.PlayerStatusData.Value = newStatusData;
-                    
-                    Debug.Log($"Player {clientId} gold deducted by {amount}. Remaining gold: {newStatusData.Gold}");
-                }
-                else
-                {
-                    Debug.LogError($"PlayerModel component not found on PlayerObject for ClientId {clientId}");
-                }
-            }
-            else
-            {
-                Debug.LogError($"Client {clientId} not found in NetworkManager");
-            }
-        }
+        //플레이어 골드차감
+        var player = PlayerHelperManager.Instance.GetPlayerByClientId(clientId);
+        var currentStatus = player.PlayerStatusData.Value;
+        currentStatus.Gold -= amount;
+        player.PlayerStatusData.Value = currentStatus;
+        
+        Debug.Log($"[GameManager] Player {clientId} gold deducted by {amount}. Remaining gold: {player.PlayerStatusData.Value.Gold}");
     }
 }

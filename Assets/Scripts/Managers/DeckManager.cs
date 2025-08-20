@@ -5,6 +5,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+public struct TotalCardsOnGameData : INetworkSerializable, IEquatable<TotalCardsOnGameData>
+{
+    public int cardId;
+    public int cardTotalCount;
+    
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref cardId);
+        serializer.SerializeValue(ref cardTotalCount);
+    }
+
+    public bool Equals(TotalCardsOnGameData other)
+    {
+        return cardId == other.cardId && cardTotalCount == other.cardTotalCount;
+    }
+    
+    public override bool Equals(object obj)
+    {
+        return obj is TotalCardsOnGameData other && Equals(other);
+    }
+    
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(cardId, cardTotalCount);
+    }
+}
+
 /// <summary>
 /// 덱 매니저: 게임 내 전체 카드 매물을 관리하는 매니저
 /// 
@@ -54,69 +81,135 @@ public class DeckManager : NetworkBehaviour
     #endregion
 
     #region 게임 내 전체 카드 매물 관리(덱 관리)
-    private readonly Dictionary<int, int> _totalCardsOnGame = new();
-    public IReadOnlyDictionary<int, int> TotalCardsOnGame => _totalCardsOnGame;
+    private NetworkList<TotalCardsOnGameData> _totalCardsOnGame = new NetworkList<TotalCardsOnGameData>();
+    public NetworkList<TotalCardsOnGameData> TotalCardsOnGame => _totalCardsOnGame;
+
+
+
     public async Task SetTotalCardsOnGame(CardKeyValuePair[] cardKeyValuePairs)
     {
+        if(!IsHost)
+        {
+            return;
+        }
+
         if (cardKeyValuePairs == null)
         {
             Debug.LogError("[CardItemFactory] 전달받은 카드 데이터가 null입니다.");
             return;
         }
 
+        _totalCardsOnGame.Clear();
+
         foreach (var card in cardKeyValuePairs)
         {
-            _totalCardsOnGame[card.Key] = card.Value.AmountOfCardItem;
+            var cardData = new TotalCardsOnGameData
+            {
+                cardId = card.Key,
+                cardTotalCount = card.Value.AmountOfCardItem
+            };
+            _totalCardsOnGame.Add(cardData);
         }
+
         Debug.Log($"[DeckManager] {_totalCardsOnGame.Count}개 카드 데이터 설정 완료");
         foreach (var card in _totalCardsOnGame)
         {
-            Debug.Log($"[DeckManager] CardID: {card.Key}, Amount: {card.Value}");
+            Debug.Log($"[DeckManager] CardID: {card.cardId}, Amount: {card.cardTotalCount}");
         }
     }
 
     #endregion
 
-    /*
+
     #region 카드 구매 처리
-    [ServerRpc]
-    public void TryPurchaseCardServerRpc(int cardID, ulong clientId, int cardPrice)
+
+    [ServerRpc(RequireOwnership = false)]
+    public void TryPurchaseCardServerRpc(InventoryCard card, ulong clientId)
     {
-        //만약 물량 없으면 리턴 
-        if (TotalCardsOnGame[cardID] <= 0)
+        CardShopPresenter cardShopPresenter;
+        cardShopPresenter = GameObject.FindObjectOfType<CardShopPresenter>();
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
         {
-            // TODO: 구매 성공 여부를 CardShop에게 전달. (ClientRPC, bool값 보내기)
-            // cardShop.PurchaseCardResultClientRpc(false);
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { clientId }
+            }
+        };
+
+        // 해당 카드가 존재하는지 확인
+        TotalCardsOnGameData cardData = default;
+        bool found = false;
+
+        for (int i = 0; i < _totalCardsOnGame.Count; i++)
+        {
+            if (_totalCardsOnGame[i].cardId == card.CardID)
+            {
+                cardData = _totalCardsOnGame[i];
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            Debug.LogError($"[DeckManager] CardID {card.CardID}가 TotalCardsOnGame에 존재하지 않습니다.");
+            cardShopPresenter.PurchaseCardResultClientRpc(false, clientRpcParams);
+            return;
+        }
+
+
+
+        //만약 물량 없으면 리턴 
+        if (cardData.cardTotalCount <= 0)
+        {
+            Debug.Log($"[DeckManager] CardID {card.CardID}의 물량이 없습니다. 구매 실패");
+            //구매 성공 여부를 CardShop에게 전달. (ClientRPC, bool값 보내기)
+            cardShopPresenter.PurchaseCardResultClientRpc(false, clientRpcParams);
             return;
         }
 
         // 플레이어 골드 확인
         int playerGold = PlayerHelperManager.Instance.GetPlayerGoldByClientId(clientId);
-        if (playerGold < cardPrice)
+        if (playerGold < card.Status.Price)
         {
-            // TODO: 구매 성공 여부를 CardShop에게 전달. (ClientRPC, bool값 보내기)
-            // cardShop.PurchaseCardResultClientRpc(false);
+            //구매 성공 여부를 CardShop에게 전달. (ClientRPC, bool값 보내기)
+            cardShopPresenter.PurchaseCardResultClientRpc(false, clientRpcParams);
             return;
         }
 
-        // 물량 감소 (NetworkVariable 동기화)
-        var newTotalCards = new Dictionary<int, int>(TotalCardsOnGame);
-        newTotalCards[cardID]--;
-        _totalCardsOnGame.Value = newTotalCards;
+        // 물량 감소 (NetworkList 동기화)
+        var index = _totalCardsOnGame.IndexOf(cardData);
+        var newCardData = new TotalCardsOnGameData
+        {
+            cardId = cardData.cardId,
+            cardTotalCount = cardData.cardTotalCount - 1
+        };
+        _totalCardsOnGame[index] = newCardData;
 
         // GameManager에게 해당 클라이언트의 골드 차감 요청 (책임 분리)
-        GameManager.Instance.DeductPlayerGoldServerRpc(clientId, cardPrice);
+        GameManager.Instance.DeductPlayerGoldServerRpc(clientId, card.Status.Price);
 
-        Debug.Log($"Player {clientId} purchased card {cardID} for {cardPrice} gold");
+        Debug.Log($"[DeckManager] Player {clientId} purchased card {card.CardID} for {card.Status.Price} gold");
 
-        // TODO: 플레이어 인벤토리에 카드 추가
 
-        // TODO: 구매 성공 여부를 CardShop에게 전달. (ClientRPC, bool값 보내기)
-        // cardShop.PurchaseCardResultClientRpc(true);
+        //구매 성공 여부를 CardShop에게 전달. (ClientRPC, bool값 보내기)
+        cardShopPresenter.PurchaseCardResultClientRpc(true, clientRpcParams);
 
-        // TODO: 카드 상태 주입 (Sold)
+        // 카드 상태 주입 (Sold)
+        var updatedCard = card;
+        updatedCard.Status.State = CardItemState.Sold;
+        card = updatedCard;
 
+        //카드 획득 시간 주입
+        updatedCard.AcquiredTicks = DateTime.Now.Ticks;
+        card = updatedCard;
+
+        // 해당 플레이어 인벤토리에 카드 추가
+        PlayerHelperManager.Instance.GetPlayerGameObjectByClientId(clientId).GetComponent<CardInventoryModel>().AddOwnedCard(card);
 
     }
-    #endregion */
+
+    
+    #endregion
 }

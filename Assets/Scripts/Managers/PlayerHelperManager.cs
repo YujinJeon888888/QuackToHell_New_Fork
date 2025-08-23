@@ -92,6 +92,27 @@ public class PlayerHelperManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 클라이언트 ID로 플레이어를 찾아서 플레이어 게임 오브젝트 반환
+    /// </summary>
+    /// <param name="clientId">찾을 플레이어의 클라이언트 ID</param>
+    /// <returns>플레이어의 PlayerModel, 찾지 못하면 null</returns>
+    public GameObject GetPlayerGameObjectByClientId(ulong clientId)
+    {
+        PlayerModel[] allPlayers = FindObjectsOfType<PlayerModel>();
+        
+        foreach (PlayerModel player in allPlayers)
+        {
+            if (player.NetworkObject != null && player.NetworkObject.OwnerClientId == clientId)
+            {
+                return player.gameObject;
+            }
+        }
+        
+        Debug.LogWarning($"Player with ClientId {clientId} not found in scene");
+        return null;
+    }
+
+    /// <summary>
     /// 현재 씬의 모든 플레이어 수 반환
     /// </summary>
     /// <returns>플레이어 수</returns>

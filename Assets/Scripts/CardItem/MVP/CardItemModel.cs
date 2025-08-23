@@ -3,6 +3,34 @@ using Unity.Netcode;
 
 public class CardItemModel : NetworkBehaviour
 {
+    private void Start()
+    {
+        //carditemdefdata값 바뀌면 OnCardDefDataChanged 실행
+        OnCardDefDataChanged += (newValue) =>
+        {
+            CardDefData = newValue;
+        };
+
+        //carditemstate값 바뀌면 SetStateByCardItemStateEnum() 실행
+        OnCardItemStatusDataChanged += (newValue) =>
+        {
+            SetStateByCardItemStateEnum(newValue.State);
+            ApplyStateChange();
+        };
+        //초기화 실행
+        SetStateByCardItemStateEnum(CardItemStatusData.State);
+        ApplyStateChange();
+
+        
+    }
+    private void Update()
+    {
+        if (curState != null)
+        {
+            curState.OnStateUpdate();
+        }
+    }
+
     #region 데이터
     //데이터
     private CardDef _cardDefData = new();
@@ -77,10 +105,6 @@ public class CardItemModel : NetworkBehaviour
 
     private void ApplyStateChange()
     {
-        if (preState != null)
-        {
-            preState.OnStateExit();
-        }
         if (preState != null)
         {
             preState.OnStateExit();

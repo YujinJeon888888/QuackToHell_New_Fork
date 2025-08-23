@@ -39,22 +39,23 @@ public sealed class CardShopPresenter : NetworkBehaviour
             s_serverByClient.Remove(OwnerClientId);
     }
 
-    private void OnClickBuy(int cardId, ulong inputClientId, int cardPrice)
+    private void OnClickBuy(InventoryCard card, ulong inputClientId)
     {
         var clientId = inputClientId == 0UL ? OwnerClientId : inputClientId;
 
         _view.ShowLoading(true);
-        TryPurchaseCard(cardId, clientId, cardPrice);
+        TryPurchaseCard(card, clientId);
     }
-    public void TryPurchaseCard(int cardID, ulong inputClientId, int cardPrice)
+    public void TryPurchaseCard(InventoryCard card, ulong inputClientId)
     {
+        Debug.Log("[CardShopPresenter] TryPurchaseCard 실행됨");
         var clientId = inputClientId == 0UL ? OwnerClientId : inputClientId;
-        _model.RequestPurchase(cardID, clientId, cardPrice);
+        _model.RequestPurchase(card, clientId);
         // 결과는 아래 ClientRpc로 받음
     }
 
     [ClientRpc]
-    private void PurchaseClientRpc(bool success, ClientRpcParams sendParams = default)
+    public void PurchaseCardResultClientRpc(bool success, ClientRpcParams sendParams = default)
     {
         if (_view == null) return;
         _view.ShowLoading(false);
@@ -68,7 +69,7 @@ public sealed class CardShopPresenter : NetworkBehaviour
         if (s_serverByClient.TryGetValue(clientId, out var presenter))
         {
             var p = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } } };
-            presenter.PurchaseClientRpc(success, p);
+            presenter.PurchaseCardResultClientRpc(success, p);
         }
     }
 }

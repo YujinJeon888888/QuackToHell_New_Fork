@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Unity.Netcode;
+using Unity.Collections;
 
 #region Data Structs (기획서 타입 반영)
 public enum TierEnum { None = 0, Common = 1, Rare = 2, Special = 3 }
 public enum TypeEnum { None = 0, Attack = 1, Defense = 2, Special = 3 }
 
 // 딕셔너리의 Key와 Value 한 쌍을 담을 컨테이너 struct
-public struct CardKeyValuePair : INetworkSerializable
+public struct CardKeyValuePair : INetworkSerializable, IEquatable<CardKeyValuePair>
 {
     public int Key;
     public CardDef Value;
@@ -19,12 +20,27 @@ public struct CardKeyValuePair : INetworkSerializable
         serializer.SerializeValue(ref Key);
         serializer.SerializeValue(ref Value);
     }
+
+    public bool Equals(CardKeyValuePair other)
+    {
+        return Key == other.Key && Value.Equals(other.Value);
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is CardKeyValuePair pair && Equals(pair);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Key, Value);
+    }
 }
 
-public struct CardDef : INetworkSerializable
+public struct CardDef : INetworkSerializable, IEquatable<CardDef>
 {
     public int CardID;
-    public string CardNameKey;
+    public FixedString64Bytes CardNameKey;
     public TierEnum Tier;      // enum
     public TypeEnum Type;      // enum
     public int SubType;        // 사용 안 하면 0
@@ -34,8 +50,8 @@ public struct CardDef : INetworkSerializable
     public int Map_Restriction;  // 2bit
     public int BasePrice;
     public int BaseCost;
-    public string DescriptionKey;
-    public string ImagePathKey;
+    public FixedString64Bytes DescriptionKey;
+    public FixedString64Bytes ImagePathKey;
     public int AmountOfCardItem;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
@@ -55,6 +71,49 @@ public struct CardDef : INetworkSerializable
         serializer.SerializeValue(ref ImagePathKey);
         serializer.SerializeValue(ref AmountOfCardItem);
     }
+
+    public bool Equals(CardDef other)
+    {
+        return CardID == other.CardID && 
+               CardNameKey.Equals(other.CardNameKey) && 
+               Tier == other.Tier && 
+               Type == other.Type && 
+               SubType == other.SubType && 
+               IsUniqueCard == other.IsUniqueCard && 
+               IsSellableCard == other.IsSellableCard && 
+               UsableClass == other.UsableClass && 
+               Map_Restriction == other.Map_Restriction && 
+               BasePrice == other.BasePrice && 
+               BaseCost == other.BaseCost && 
+               DescriptionKey.Equals(other.DescriptionKey) && 
+               ImagePathKey.Equals(other.ImagePathKey) && 
+               AmountOfCardItem == other.AmountOfCardItem;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is CardDef def && Equals(def);
+    }
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(CardID);
+        hash.Add(CardNameKey);
+        hash.Add(Tier);
+        hash.Add(Type);
+        hash.Add(SubType);
+        hash.Add(IsUniqueCard);
+        hash.Add(IsSellableCard);
+        hash.Add(UsableClass);
+        hash.Add(Map_Restriction);
+        hash.Add(BasePrice);
+        hash.Add(BaseCost);
+        hash.Add(DescriptionKey);
+        hash.Add(ImagePathKey);
+        hash.Add(AmountOfCardItem);
+        return hash.ToHashCode();
+    }
 }
 
 
@@ -65,13 +124,36 @@ public enum CardItemState
 }
 
 
-public struct CardItemStatusData 
+public struct CardItemStatusData : INetworkSerializable, IEquatable<CardItemStatusData>
 {
     public int CardItemID;
     public int CardID;
     public int Price;
     public int Cost;
+    public CardItemState State;
 
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref CardItemID);
+        serializer.SerializeValue(ref CardID);
+        serializer.SerializeValue(ref Price);
+        serializer.SerializeValue(ref Cost);
+    }
+
+    public bool Equals(CardItemStatusData other)
+    {
+        return CardItemID == other.CardItemID && CardID == other.CardID && Price == other.Price && Cost == other.Cost && State == other.State;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is CardItemStatusData data && Equals(data);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(CardItemID, CardID, Price, Cost, State);
+    }   
 }
 
 [Serializable] public struct StringRow { public string Key; public string KR; public string EN; }

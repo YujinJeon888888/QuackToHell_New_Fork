@@ -45,9 +45,9 @@ public sealed class CardDataPresenter
         disp = new CardDisplay
         {
             CardID = d.CardID,
-            Name = _model.Localize(d.CardNameKey, locale),
-            Description = _model.Localize(d.DescriptionKey, locale),
-            ImagePath = _model.ResolvePath(d.ImagePathKey),
+            Name = _model.Localize(d.CardNameKey.ToString(), locale),
+            Description = _model.Localize(d.DescriptionKey.ToString(), locale),
+            ImagePath = _model.ResolvePath(d.ImagePathKey.ToString()),
             Tier = d.Tier,
             Type = d.Type,
             BasePrice = d.BasePrice,

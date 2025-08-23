@@ -29,7 +29,6 @@ public class PlayerModel : NetworkBehaviour
             ApplyStateChange();
         };
         
-
     }
 
     private void Update()

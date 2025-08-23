@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using Unity.Netcode;
 using TMPro;
+using UnityEngine.EventSystems;
 
-public class CardItemView : NetworkBehaviour
+public class CardItemView : NetworkBehaviour, IPointerClickHandler
 {
     #region 외향
     [SerializeField]
@@ -65,12 +66,18 @@ public class CardItemView : NetworkBehaviour
     //인자로, 구매하려는 플레이어의 클라이언트 아이디 전달
     public event System.Action<ulong> OnPurchaseClicked;
 
-    private void OnMouseDown()
+    public void OnPointerClick(PointerEventData eventData)
     {
         //만약 오브젝트가 Card for Sale이라면 구매 클릭 이벤트 전달
-        if (gameObject.name == "Card for Sale")
-        {
-            OnPurchaseClicked?.Invoke(NetworkManager.Singleton.LocalClientId);
+        Transform parentTransform = transform.parent;
+
+        if (parentTransform != null)
+        { 
+            if (parentTransform.CompareTag("CardForSale"))
+            {
+                Debug.Log("[CardItemView] Card for Sale 클릭");
+                OnPurchaseClicked?.Invoke(NetworkManager.Singleton.LocalClientId);
+            }
         }
     }
 

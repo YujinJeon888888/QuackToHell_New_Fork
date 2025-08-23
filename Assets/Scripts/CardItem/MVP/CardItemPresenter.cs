@@ -1,7 +1,9 @@
 using UnityEngine;
+using System;
 
 public class CardItemPresenter : MonoBehaviour
 {
+
     private void Start()
     {
         //구매 클릭 이벤트 바인딩
@@ -32,10 +34,10 @@ public class CardItemPresenter : MonoBehaviour
 
     private void CardDefData_OnValueChanged(CardDef cardDefData)
     {
-        cardItemView.SetCardItemNameAppearence(cardDefData.CardNameKey, cardDefData.Tier);
+        cardItemView.SetCardItemNameAppearence(cardDefData.CardNameKey.ToString(), cardDefData.Tier);
         cardItemView.SetCardItemImageAppearence(cardDefData.Tier, cardDefData.Type);
         cardItemView.SetCardTypeAppearence(cardDefData.Map_Restriction, cardDefData.Type);
-        cardItemView.SetCardDefinitionAppearence(cardDefData.DescriptionKey);
+        cardItemView.SetCardDefinitionAppearence(cardDefData.DescriptionKey.ToString());
         cardItemView.SetCardCharacteristicAppearence(cardItemModel.CardItemStatusData.Cost, cardDefData.Type, cardDefData.Map_Restriction);
     }
     private void CardItemStatusData_OnValueChanged(CardItemStatusData cardItemStatusData)
@@ -46,13 +48,19 @@ public class CardItemPresenter : MonoBehaviour
     #endregion
 
     #region 구매 클릭 입력 이벤트 전달
-
+    private CardShopPresenter cardShopPresenter;
     private void CardItemView_OnPurchaseClicked(ulong inputClientId)
-    {        
-        int cardID = cardItemModel.CardItemStatusData.CardID;
-        int cardPrice = cardItemModel.CardItemStatusData.Price;
+    {
+        Debug.Log("[CardItemPresenter] cardShopPresenter.TryPurchaseCard 호출");
+        InventoryCard card = new InventoryCard
+        {
+            CardID = cardItemModel.CardItemStatusData.CardID,
+            Status = cardItemModel.CardItemStatusData,
+            AcquiredTicks = DateTime.UtcNow.Ticks
+        };
         // TODO:CardShop에게 카드 구매 요청 : 카드 아이디, 플레이어 아이디, 카드 가격 보내주기
-        //cardShopModel.TryPurchaseCard(cardID, inputClientId, cardPrice);
+        cardShopPresenter = GameObject.FindObjectOfType<CardShopPresenter>();
+        cardShopPresenter.TryPurchaseCard(card, inputClientId);
     }
     #endregion
 }

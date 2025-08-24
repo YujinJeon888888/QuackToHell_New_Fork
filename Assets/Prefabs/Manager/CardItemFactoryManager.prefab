@@ -45,3 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardItemForSalePrefab: {fileID: 3226483900878045010, guid: d4294cbcc488d1c48a0dc64b2fd8f62d, type: 3}
+  cardItemForInventoryPrefab: {fileID: 2882950834005421922, guid: 779af19041c2f42d781d45c0d87c8afd, type: 3}

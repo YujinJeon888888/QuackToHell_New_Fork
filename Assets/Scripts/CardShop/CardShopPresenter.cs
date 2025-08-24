@@ -1,15 +1,17 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 
-// Presenter: View 입력 → Model 호출, 결과 ClientRpc 수신 → View 반영
 public sealed class CardShopPresenter : NetworkBehaviour
 {
-    [SerializeField] private MonoBehaviour viewBehaviour; // CardShopView 할당
+    [SerializeField] private MonoBehaviour viewBehaviour;
+    [SerializeField] private float rerollCooldown = 0.2f;
+
     private ICardShopView _view;
     private ICardShopModel _model;
-
     private static readonly Dictionary<ulong, CardShopPresenter> s_serverByClient = new();
+    private bool _cooldown;
 
     private void Awake()
     {
@@ -22,7 +24,11 @@ public sealed class CardShopPresenter : NetworkBehaviour
         base.OnNetworkSpawn();
 
         if (IsOwner && _view != null)
+        {
             _view.OnClickBuy += OnClickBuy;
+            _view.OnClickLock += OnClickLock;
+            _view.OnClickReRoll += OnClickReRoll;
+        }
 
         if (IsServer)
             s_serverByClient[OwnerClientId] = this;
@@ -33,42 +39,76 @@ public sealed class CardShopPresenter : NetworkBehaviour
         base.OnNetworkDespawn();
 
         if (IsOwner && _view != null)
+        {
             _view.OnClickBuy -= OnClickBuy;
+            _view.OnClickLock -= OnClickLock; 
+            _view.OnClickReRoll -= OnClickReRoll; 
+        }
 
         if (IsServer)
             s_serverByClient.Remove(OwnerClientId);
     }
-
     private void OnClickBuy(int cardId, ulong inputClientId, int cardPrice)
     {
         var clientId = inputClientId == 0UL ? OwnerClientId : inputClientId;
-
         _view.ShowLoading(true);
-        TryPurchaseCard(cardId, clientId, cardPrice);
+        TryPurchaseCard(card, clientId);
     }
+
     public void TryPurchaseCard(int cardID, ulong inputClientId, int cardPrice)
     {
+        Debug.Log("[CardShopPresenter] TryPurchaseCard 실행됨");
         var clientId = inputClientId == 0UL ? OwnerClientId : inputClientId;
         _model.RequestPurchase(cardID, clientId, cardPrice);
-        // 결과는 아래 ClientRpc로 받음
     }
 
     [ClientRpc]
-    private void PurchaseClientRpc(bool success, ClientRpcParams sendParams = default)
+    public void PurchaseCardResultClientRpc(bool success, ClientRpcParams sendParams = default)
     {
         if (_view == null) return;
         _view.ShowLoading(false);
         _view.ShowResult(success, success ? "구매 성공" : "구매 실패");
     }
 
-    // 서버에서 특정 클라의 Presenter로 결과 보내는 헬퍼(DeckManager에서 호출하면 됨)
-    public static void ServerSendResultTo(ulong clientId, bool success)
+    private void OnClickLock()
+    {
+        _model.IsLocked = !_model.IsLocked;
+        _view.SetLockedVisual(_model.IsLocked);
+        _view.ShowResult(true, _model.IsLocked ? "목록 고정됨" : "목록 고정 해제");
+    }
+    private void OnClickReRoll()
+    {
+        if (_cooldown)
+            return;
+
+        if (!_model.TryReRoll())
+        {
+            _view.ShowResult(false, "잠금 상태에서는 새로고침 불가");
+            return;
+        }
+
+        StartCoroutine(RerollCooldown());
+        _view.ShowResult(true, "새로고침 완료");
+
+        // 실제 카드목록 UI를 갱신하려면 여기서 View.Render(...)를 호출하도록
+    }
+
+    private IEnumerator RerollCooldown()
+    {
+        _cooldown = true;
+        _view.SetRefreshInteractable(false);
+        yield return new WaitForSeconds(rerollCooldown);
+        _view.SetRefreshInteractable(true);
+        _cooldown = false;
+    }
+
+public static void ServerSendResultTo(ulong clientId, bool success)
     {
         if (!NetworkManager.Singleton || !NetworkManager.Singleton.IsServer) return;
         if (s_serverByClient.TryGetValue(clientId, out var presenter))
         {
             var p = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } } };
-            presenter.PurchaseClientRpc(success, p);
+            presenter.PurchaseCardResultClientRpc(success, p);
         }
     }
 }

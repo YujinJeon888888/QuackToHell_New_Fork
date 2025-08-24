@@ -5,40 +5,37 @@ using UnityEngine.UI;
 
 public interface ICardShopView
 {
-    event Action<InventoryCard, ulong> OnClickBuy; // (card, clientId)
+    event Action<int, ulong, int> OnClickBuy;
+    event Action OnClickLock;
+    event Action OnClickReRoll;
+
     void ShowLoading(bool on);
     void ShowResult(bool success, string msg);
+
+    void SetLockedVisual(bool locked);
+    void SetRefreshInteractable(bool interactable);
 }
 
-public sealed class CardShopView : MonoBehaviour, ICardShopView
+public sealed class CardShopView : MonoBehaviour
 {
     [Header("UI")]
-    //[SerializeField] private Button buyButton;
-    [SerializeField] private TMP_InputField cardIdInput;
-    [SerializeField] private TMP_InputField priceInput;
-    [SerializeField] private TMP_Text statusText;
 
-    public event Action<InventoryCard, ulong> OnClickBuy;
+    [SerializeField] private Button lockButton;
+    [SerializeField] private Button rerollButton;
+
+    public event Action<int, ulong, int> OnClickBuy;
+    public event Action OnClickLock;
+    public event Action OnClickReRoll;
 
     private void Awake()
     {
-        /*buyButton.onClick.AddListener(() =>
-        {
-            if (int.TryParse(cardIdInput.text, out var cardId))
-            {
-                var card = new InventoryCard { CardID = cardId };
-                OnClickBuy?.Invoke(card, 0UL);
-            }
-        });*/
+
+        if (lockButton) lockButton.onClick.AddListener(() => OnClickLock?.Invoke());
+        if (rerollButton) rerollButton.onClick.AddListener(() => OnClickReRoll?.Invoke());
     }
 
-    public void ShowLoading(bool on)
+    public void SetRefreshInteractable(bool interactable)
     {
-        if (statusText) statusText.text = on ? "Processing..." : "";
-    }
-
-    public void ShowResult(bool success, string msg)
-    {
-        if (statusText) statusText.text = success ? $"✅ {msg}" : $"❌ {msg}";
+        if (rerollButton) rerollButton.interactable = interactable;
     }
 }

@@ -55,6 +55,7 @@ public class CardItemPresenter : MonoBehaviour
         InventoryCard card = new InventoryCard
         {
             CardID = cardItemModel.CardItemStatusData.CardID,
+            CardItemId = cardItemModel.CardItemStatusData.CardItemID,
             Status = cardItemModel.CardItemStatusData,
             AcquiredTicks = DateTime.UtcNow.Ticks
         };

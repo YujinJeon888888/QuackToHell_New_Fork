@@ -5,7 +5,7 @@ using Unity.Netcode;
 
 public sealed class CardShopPresenter : NetworkBehaviour
 {
-    [SerializeField] private MonoBehaviour viewBehaviour;
+    [SerializeField] private ICardShopView viewBehaviour;
     [SerializeField] private float rerollCooldown = 0.2f;
 
     private ICardShopView _view;
@@ -15,7 +15,7 @@ public sealed class CardShopPresenter : NetworkBehaviour
 
     private void Awake()
     {
-        _view = (ICardShopView)viewBehaviour;
+        _view = viewBehaviour;
         _model = new CardShopModel();
     }
 
@@ -25,7 +25,7 @@ public sealed class CardShopPresenter : NetworkBehaviour
 
         if (IsOwner && _view != null)
         {
-            _view.OnClickBuy += OnClickBuy;
+
             _view.OnClickLock += OnClickLock;
             _view.OnClickReRoll += OnClickReRoll;
         }
@@ -40,26 +40,20 @@ public sealed class CardShopPresenter : NetworkBehaviour
 
         if (IsOwner && _view != null)
         {
-            _view.OnClickBuy -= OnClickBuy;
-            _view.OnClickLock -= OnClickLock; 
-            _view.OnClickReRoll -= OnClickReRoll; 
+            _view.OnClickLock -= OnClickLock;
+            _view.OnClickReRoll -= OnClickReRoll;
         }
 
         if (IsServer)
             s_serverByClient.Remove(OwnerClientId);
     }
-    private void OnClickBuy(int cardId, ulong inputClientId, int cardPrice)
-    {
-        var clientId = inputClientId == 0UL ? OwnerClientId : inputClientId;
-        _view.ShowLoading(true);
-        TryPurchaseCard(card, clientId);
-    }
 
-    public void TryPurchaseCard(int cardID, ulong inputClientId, int cardPrice)
+
+    public void TryPurchaseCard(InventoryCard card, ulong inputClientId)
     {
         Debug.Log("[CardShopPresenter] TryPurchaseCard 실행됨");
         var clientId = inputClientId == 0UL ? OwnerClientId : inputClientId;
-        _model.RequestPurchase(cardID, clientId, cardPrice);
+        _model.RequestPurchase(card, inputClientId);
     }
 
     [ClientRpc]
@@ -102,7 +96,7 @@ public sealed class CardShopPresenter : NetworkBehaviour
         _cooldown = false;
     }
 
-public static void ServerSendResultTo(ulong clientId, bool success)
+    public static void ServerSendResultTo(ulong clientId, bool success)
     {
         if (!NetworkManager.Singleton || !NetworkManager.Singleton.IsServer) return;
         if (s_serverByClient.TryGetValue(clientId, out var presenter))
@@ -110,5 +104,13 @@ public static void ServerSendResultTo(ulong clientId, bool success)
             var p = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } } };
             presenter.PurchaseCardResultClientRpc(success, p);
         }
+    }
+    
+    ////////////////////////////////
+    /// test: 유진
+    /// /////////////////////////////////////////////////
+    private void Start()
+    {
+        _model.DisplayCardsForSale();
     }
 }

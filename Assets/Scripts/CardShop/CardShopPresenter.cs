@@ -94,8 +94,4 @@ public sealed class CardShopPresenter : NetworkBehaviour
         }
     }
     
-    // test: 유진
-    /*private void Start()
-    {
-        _model.DisplayCardsForSale();
 }

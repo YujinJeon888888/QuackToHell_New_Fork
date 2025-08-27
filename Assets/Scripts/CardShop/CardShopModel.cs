@@ -1,4 +1,6 @@
+using Unity.Netcode;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public interface ICardShopModel
 {
@@ -10,7 +12,7 @@ public interface ICardShopModel
     void DisplayCardsForSale();
 }
 
-public sealed class CardShopModel : ICardShopModel
+public sealed class CardShopModel
 {
     public bool IsLocked { get; set; }
 
@@ -25,33 +27,80 @@ public sealed class CardShopModel : ICardShopModel
         DeckManager.Instance.TryPurchaseCardServerRpc(card, clientId);
     }
 
+    private void DestroyCardsForSale()
+    {
+        /*var gos = GameObject.FindGameObjectsWithTag("CardForSale");
+        foreach (var go in gos)
+        {
+            if (!go) continue;
+            var netObj = go.GetComponent<NetworkObject>();
+            if (netObj && netObj.IsSpawned)
+                netObj.Despawn(true);   // 네트워크 오브젝트면 Despawn
+            else
+                Object.Destroy(go);     // 일반 오브젝트면 Destroy
+        }*/
+
+        var row = GameObject.Find("CardShopRow");
+        if (row == null) return;
+
+        // 내 Row의 자식 중에서만 삭제
+        for (int i = row.transform.childCount - 1; i >= 0; i--)
+        {
+            var child = row.transform.GetChild(i).gameObject;
+            if (!child) continue;
+
+            if (child.CompareTag("CardForSale"))
+            {
+                var net = child.GetComponent<NetworkObject>();
+                if (net && net.IsSpawned) net.Despawn(true);
+                else Object.Destroy(child);
+            }
+        }
+    }
+
     public bool TryReRoll()
     {
         if (IsLocked) return false;
 
-        // TODO: 실제 카드 목록 섞기(지금은 성공만 반환)
+        // 새로 뿌리기
+        DisplayCardsForSale();
+
         return true;
     }
-    /////////////////////////////////////////////////////
-    /// Test: 유진
-    /// /////////////////////////////////////////////////
-    
 
-    //[Obsolete("카드 생성 테스트문 - 유진")]
+    private Transform _row;
+    private Transform GetRow()
+    {
+        if (_row == null)
+        {
+            var rowGo = GameObject.Find("CardShopRow");
+            if (rowGo != null) _row = rowGo.transform;
+        }
+        return _row;
+    }
     public void DisplayCardsForSale()
     {
-        // 카드 크기: 200x350
-        float cardWidth = 200f;
-        float cardHeight = 350f;
-        float spacing = 50f; // 카드 간 간격
-        
-        // 첫 번째 행 (위쪽)
-        CardItemFactory.Instance.CreateCardForSale(10000, new Vector3(-cardWidth - spacing/2, cardHeight/2, 0));
-        CardItemFactory.Instance.CreateCardForSale(20000, new Vector3(0, cardHeight/2, 0));
-        CardItemFactory.Instance.CreateCardForSale(30000, new Vector3(cardWidth + spacing/2, cardHeight/2, 0));
-        
-        // 두 번째 행 (아래쪽)
-        CardItemFactory.Instance.CreateCardForSale(10100, new Vector3(-cardWidth/2 - spacing/4, -cardHeight/2, 0));
-        CardItemFactory.Instance.CreateCardForSale(20200, new Vector3(cardWidth/2 + spacing/4, -cardHeight/2, 0));
+        var row = GetRow();
+        if (row == null) return;
+
+        // 기존 카드 다 지우기
+        for (int i = row.childCount - 1; i >= 0; i--)
+        {
+            Object.Destroy(row.GetChild(i).gameObject);
+        }
+
+        // 5개 생성해서 Row 밑으로 붙이기
+        int[] cardIds = { 10000, 20000, 30000, 10100, 20200 };
+        for (int i = 0; i < cardIds.Length; i++)
+        {
+            CardItemFactory.Instance.CreateCardForSale(cardIds[i], Vector3.zero);
+        }
+
+        // 스폰된 카드들을 전부 Row 밑으로 이동
+        var spawned = GameObject.FindGameObjectsWithTag("CardForSale");
+        foreach (var go in spawned)
+        {
+            go.transform.SetParent(row, false);
+        }
     }
 }

@@ -5,11 +5,11 @@ using Unity.Netcode;
 
 public sealed class CardShopPresenter : NetworkBehaviour
 {
-    [SerializeField] private ICardShopView viewBehaviour;
+    [SerializeField] private CardShopView viewBehaviour;
     [SerializeField] private float rerollCooldown = 0.2f;
 
-    private ICardShopView _view;
-    private ICardShopModel _model;
+    private CardShopView _view;
+    private CardShopModel _model;
     private static readonly Dictionary<ulong, CardShopPresenter> s_serverByClient = new();
     private bool _cooldown;
 
@@ -25,7 +25,7 @@ public sealed class CardShopPresenter : NetworkBehaviour
 
         if (IsOwner && _view != null)
         {
-
+            _model.DisplayCardsForSale();
             _view.OnClickLock += OnClickLock;
             _view.OnClickReRoll += OnClickReRoll;
         }
@@ -48,43 +48,31 @@ public sealed class CardShopPresenter : NetworkBehaviour
             s_serverByClient.Remove(OwnerClientId);
     }
 
-
     public void TryPurchaseCard(InventoryCard card, ulong inputClientId)
     {
         Debug.Log("[CardShopPresenter] TryPurchaseCard 실행됨");
         var clientId = inputClientId == 0UL ? OwnerClientId : inputClientId;
-        _model.RequestPurchase(card, inputClientId);
+        _model.RequestPurchase(card, clientId);
     }
 
     [ClientRpc]
     public void PurchaseCardResultClientRpc(bool success, ClientRpcParams sendParams = default)
     {
         if (_view == null) return;
-        _view.ShowLoading(false);
-        _view.ShowResult(success, success ? "구매 성공" : "구매 실패");
     }
 
     private void OnClickLock()
     {
         _model.IsLocked = !_model.IsLocked;
-        _view.SetLockedVisual(_model.IsLocked);
-        _view.ShowResult(true, _model.IsLocked ? "목록 고정됨" : "목록 고정 해제");
     }
     private void OnClickReRoll()
     {
-        if (_cooldown)
-            return;
-
-        if (!_model.TryReRoll())
-        {
-            _view.ShowResult(false, "잠금 상태에서는 새로고침 불가");
-            return;
-        }
+        if (_cooldown) return;
 
         StartCoroutine(RerollCooldown());
-        _view.ShowResult(true, "새로고침 완료");
 
-        // 실제 카드목록 UI를 갱신하려면 여기서 View.Render(...)를 호출하도록
+        // 리롤 실행
+        var ok = _model.TryReRoll();
     }
 
     private IEnumerator RerollCooldown()
@@ -106,11 +94,8 @@ public sealed class CardShopPresenter : NetworkBehaviour
         }
     }
     
-    ////////////////////////////////
-    /// test: 유진
-    /// /////////////////////////////////////////////////
-    private void Start()
+    // test: 유진
+    /*private void Start()
     {
-        //_model.DisplayCardsForSale();
-    }
+        _model.DisplayCardsForSale();
 }

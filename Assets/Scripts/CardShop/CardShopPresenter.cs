@@ -23,7 +23,7 @@ public sealed class CardShopPresenter : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
-        if (IsOwner && _view != null)
+        if ( _view != null)
         {
             _model.DisplayCardsForSale();
             _view.OnClickLock += OnClickLock;

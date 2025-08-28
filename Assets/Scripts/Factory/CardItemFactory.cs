@@ -251,10 +251,7 @@ public class CardItemFactory : NetworkBehaviour
         cardItemModel.CardDefData = cardDef;
         cardItemModel.CardItemStatusData = cardItemStatusData;
         Debug.Log($"[CardItemFactory] 카드 아이템 생성 완료. CardID: {cardId}, CardName: {cardDef.CardNameKey}, Price: {cardItemStatusData.Price}, Cost: {cardItemStatusData.Cost}, CardItemID: {cardItemStatusData.CardItemID}");
-        //캔버스 부착
-        cardItemForSale.transform.SetParent(GameObject.FindWithTag("CardShop").transform);
-        cardItemForSale.transform.localScale = Vector3.one;
-        cardItemForSale.transform.localPosition = inputPosition;
+        
     }
     #endregion
 

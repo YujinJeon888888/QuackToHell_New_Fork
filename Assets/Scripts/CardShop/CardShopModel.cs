@@ -40,6 +40,7 @@ public sealed class CardShopModel
     private Transform _row;
     private Transform GetRow()
     {
+        Debug.Log($"[CardShopModel] GetRow 실행됨");
         if (_row == null)
         {
             var rowGo = GameObject.Find("CardShopRow");
@@ -49,6 +50,7 @@ public sealed class CardShopModel
     }
     public void DisplayCardsForSale()
     {
+        Debug.Log($"[CardShopModel] 카드 진열함수 들어옴");
         if (IsLocked)
         {
             Debug.Log("[CardShopModel] Locked: skip DisplayCardsForSale");
@@ -57,6 +59,7 @@ public sealed class CardShopModel
 
         var row = GetRow();
         if (row == null) return;
+        Debug.Log($"[CardShopModel] 카드 진열함수: 부모오브젝트 세팅 완료");
 
         // 기존 카드 다 지우기
         for (int i = row.childCount - 1; i >= 0; i--)
@@ -68,6 +71,7 @@ public sealed class CardShopModel
         int[] cardIds = { 10000, 20000, 30000, 10100, 20200 };
         for (int i = 0; i < cardIds.Length; i++)
         {
+            Debug.Log($"[CardShopModel] 카드 진열함수: 카드 생성");
             CardItemFactory.Instance.CreateCardForSale(cardIds[i], Vector3.zero);
         }
 
@@ -75,6 +79,7 @@ public sealed class CardShopModel
         var spawned = GameObject.FindGameObjectsWithTag("CardForSale");
         foreach (var go in spawned)
         {
+            Debug.Log($"[CardShopModel] 카드 진열함수: 카드의 부모오브젝트 세팅");
             go.transform.SetParent(row, false);
         }
     }

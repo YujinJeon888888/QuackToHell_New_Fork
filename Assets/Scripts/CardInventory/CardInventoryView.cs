@@ -16,8 +16,8 @@ public class CardInventoryView : MonoBehaviour
 
     private void Start()
     {
-        var cardShopCanvasInstance = Instantiate(cardShop);
-        cardShopInstance = GameObject.FindWithTag("CardShop");
+        //var cardShopCanvasInstance = Instantiate(cardShop);
+        //cardShopInstance = GameObject.FindWithTag("CardShop");
         
     }
     public void UpdateInventoryView(List<InventoryCard> ownedCards)

@@ -867,7 +867,7 @@ GameObject:
   - component: {fileID: 350448156}
   m_Layer: 5
   m_Name: Village UI Canvas
-  m_TagString: CardForSale
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2798,7 +2798,7 @@ GameObject:
   - component: {fileID: 1415414513}
   m_Layer: 5
   m_Name: CardShopCanvas
-  m_TagString: Untagged
+  m_TagString: CardShop
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -43,10 +43,11 @@ public sealed class CardShopView : MonoBehaviour
     #region x버튼 바인딩 함수
 
     private GameObject cardShopInstance;
-    private void Start()
+    
+    private void OnEnable()
     {
         cardShopInstance = GameObject.FindWithTag("CardShop");
-        cardShopInstance.SetActive(false);
+        //cardShopInstance.SetActive(false);
     }
 
     /// <summary>

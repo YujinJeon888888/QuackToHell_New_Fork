@@ -12,12 +12,12 @@ public class CardInventoryView : MonoBehaviour
     [SerializeField]
     private GameObject cardShop;
 
-    //private GameObject cardShopInstance;
+    private GameObject cardShopInstance;
 
     private void Start()
     {
-        //var cardShopCanvasInstance = Instantiate(cardShop);
-        //cardShopInstance = GameObject.FindWithTag("CardShop");
+        var cardShopCanvasInstance = Instantiate(cardShop);
+        cardShopInstance = GameObject.FindWithTag("CardShop");
         
     }
     public void UpdateInventoryView(List<InventoryCard> ownedCards)
@@ -43,8 +43,8 @@ public class CardInventoryView : MonoBehaviour
     }
     public void PlusButton_OnClick()
     {
-        //cardShopInstance.SetActive(true);
-        //cardShopInstance.GetComponent<Animator>().SetBool("Active", true);
+        cardShopInstance.SetActive(true);
+        cardShopInstance.GetComponent<Animator>().SetBool("Active", true);
     }
     #endregion
 }

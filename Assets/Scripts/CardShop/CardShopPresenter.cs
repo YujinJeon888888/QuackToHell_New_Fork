@@ -64,9 +64,11 @@ public sealed class CardShopPresenter : NetworkBehaviour
     private void OnClickLock()
     {
         _model.IsLocked = !_model.IsLocked;
+        _view.SetRefreshInteractable(!_model.IsLocked);
     }
     private void OnClickReRoll()
     {
+        if (_model.IsLocked) return;
         if (_cooldown) return;
 
         StartCoroutine(RerollCooldown());

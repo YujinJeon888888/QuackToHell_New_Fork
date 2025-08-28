@@ -8,7 +8,6 @@ public interface ICardShopModel
 
     bool IsLocked { get; set; }
     bool TryReRoll();
-    //Test: 유진
     void DisplayCardsForSale();
 }
 
@@ -27,37 +26,7 @@ public sealed class CardShopModel
         DeckManager.Instance.TryPurchaseCardServerRpc(card, clientId);
     }
 
-    private void DestroyCardsForSale()
-    {
-        /*var gos = GameObject.FindGameObjectsWithTag("CardForSale");
-        foreach (var go in gos)
-        {
-            if (!go) continue;
-            var netObj = go.GetComponent<NetworkObject>();
-            if (netObj && netObj.IsSpawned)
-                netObj.Despawn(true);   // 네트워크 오브젝트면 Despawn
-            else
-                Object.Destroy(go);     // 일반 오브젝트면 Destroy
-        }*/
-
-        var row = GameObject.Find("CardShopRow");
-        if (row == null) return;
-
-        // 내 Row의 자식 중에서만 삭제
-        for (int i = row.transform.childCount - 1; i >= 0; i--)
-        {
-            var child = row.transform.GetChild(i).gameObject;
-            if (!child) continue;
-
-            if (child.CompareTag("CardForSale"))
-            {
-                var net = child.GetComponent<NetworkObject>();
-                if (net && net.IsSpawned) net.Despawn(true);
-                else Object.Destroy(child);
-            }
-        }
-    }
-
+    #region 카드 목록 새로고침
     public bool TryReRoll()
     {
         if (IsLocked) return false;
@@ -80,6 +49,12 @@ public sealed class CardShopModel
     }
     public void DisplayCardsForSale()
     {
+        if (IsLocked)
+        {
+            Debug.Log("[CardShopModel] Locked: skip DisplayCardsForSale");
+            return;
+        }
+
         var row = GetRow();
         if (row == null) return;
 
@@ -103,4 +78,5 @@ public sealed class CardShopModel
             go.transform.SetParent(row, false);
         }
     }
+    #endregion
 }

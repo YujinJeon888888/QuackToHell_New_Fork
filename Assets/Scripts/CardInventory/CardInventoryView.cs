@@ -12,7 +12,7 @@ public class CardInventoryView : MonoBehaviour
     [SerializeField]
     private GameObject cardShop;
 
-    private GameObject cardShopInstance;
+    //private GameObject cardShopInstance;
 
     private void Start()
     {
@@ -43,9 +43,8 @@ public class CardInventoryView : MonoBehaviour
     }
     public void PlusButton_OnClick()
     {
-        
-        cardShopInstance.SetActive(true);
-        cardShopInstance.GetComponent<Animator>().SetBool("Active", true);
+        //cardShopInstance.SetActive(true);
+        //cardShopInstance.GetComponent<Animator>().SetBool("Active", true);
     }
     #endregion
 }

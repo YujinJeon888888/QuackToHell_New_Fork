@@ -867,7 +867,7 @@ GameObject:
   - component: {fileID: 350448156}
   m_Layer: 5
   m_Name: Village UI Canvas
-  m_TagString: Untagged
+  m_TagString: CardForSale
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

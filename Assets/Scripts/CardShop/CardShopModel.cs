@@ -40,6 +40,7 @@ public sealed class CardShopModel
     private Transform _row;
     private Transform GetRow()
     {
+        Debug.Log($"[CardShopModel] GetRow 실행됨");
         if (_row == null)
         {
             GameObject rowParent = GameObject.FindWithTag("CardShop");

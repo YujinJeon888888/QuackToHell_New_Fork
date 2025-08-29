@@ -225,6 +225,8 @@ public class CardItemFactory : NetworkBehaviour
         });
     }
 
+    public Action OnCardForSaleCreated;
+
     /// <summary>
     /// CardItemId를 받은 후 실제 카드를 생성합니다.
     /// </summary>
@@ -251,7 +253,8 @@ public class CardItemFactory : NetworkBehaviour
         cardItemModel.CardDefData = cardDef;
         cardItemModel.CardItemStatusData = cardItemStatusData;
         Debug.Log($"[CardItemFactory] 카드 아이템 생성 완료. CardID: {cardId}, CardName: {cardDef.CardNameKey}, Price: {cardItemStatusData.Price}, Cost: {cardItemStatusData.Cost}, CardItemID: {cardItemStatusData.CardItemID}");
-        
+        //카드 생성되었음을 알림
+        OnCardForSaleCreated.Invoke();
     }
     #endregion
 

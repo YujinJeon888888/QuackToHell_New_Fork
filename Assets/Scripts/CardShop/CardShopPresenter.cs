@@ -20,6 +20,7 @@ public sealed class CardShopPresenter : NetworkBehaviour
     }
     private void Start() {
         _model.DisplayCardsForSale();
+        CardItemFactory.Instance.OnCardForSaleCreated+=CardItemFactory_OnCardForSaleCreated;
     }
 
     public override void OnNetworkSpawn()
@@ -97,5 +98,12 @@ public sealed class CardShopPresenter : NetworkBehaviour
             presenter.PurchaseCardResultClientRpc(success, p);
         }
     }
-    
+
+    #region 카드생성 콜백
+    public void CardItemFactory_OnCardForSaleCreated()
+    {
+        _model.MoveCardsForSaleToRowObject();
+    }
+    #endregion
+
 }

@@ -42,12 +42,16 @@ public sealed class CardShopView : MonoBehaviour
 
     #region x버튼 바인딩 함수
 
-    private GameObject cardShopInstance;
     
-    private void OnEnable()
+    private GameObject cardShopPanel;
+    private Animator cardShopPanelAnimator;
+
+    private void Start()
     {
-        cardShopInstance = GameObject.FindWithTag("CardShop");
-        //cardShopInstance.SetActive(false);
+        
+        GameObject cardShopParent = GameObject.FindWithTag("CardShop");
+        cardShopPanel = cardShopParent.transform.Find("CardShopPanel").gameObject;
+        cardShopPanelAnimator = cardShopPanel.GetComponent<Animator>();
     }
 
     /// <summary>
@@ -56,7 +60,7 @@ public sealed class CardShopView : MonoBehaviour
     public void XButton_OnClick()
     {
         Debug.Log("[CardShopView] XButton_OnClick");
-        cardShopInstance.GetComponent<Animator>().SetBool("Active", false);
+        cardShopPanel.GetComponent<Animator>().SetBool("Active", false);
     }    
 
     #endregion

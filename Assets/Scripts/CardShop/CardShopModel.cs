@@ -11,7 +11,7 @@ public interface ICardShopModel
     void DisplayCardsForSale();
 }
 
-public sealed class CardShopModel
+public sealed class CardShopModel 
 {
     public bool IsLocked { get; set; }
 
@@ -43,8 +43,20 @@ public sealed class CardShopModel
         Debug.Log($"[CardShopModel] GetRow 실행됨");
         if (_row == null)
         {
-            var rowGo = GameObject.Find("CardShopRow");
-            if (rowGo != null) _row = rowGo.transform;
+            GameObject rowParent = GameObject.FindWithTag("CardShop");
+            if (rowParent != null)
+            {
+                // 모든 자손에서 CardShopRow 찾기 (비활성화된 것도 포함)
+                Transform[] allChildren = rowParent.GetComponentsInChildren<Transform>(true);
+                foreach (Transform child in allChildren)
+                {
+                    if (child.name == "CardShopRow")
+                    {
+                        _row = child;
+                        break;
+                    }
+                }
+            }
         }
         return _row;
     }

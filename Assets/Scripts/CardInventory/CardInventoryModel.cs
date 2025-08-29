@@ -48,8 +48,9 @@ public class CardInventoryModel : NetworkBehaviour
     #endregion
 
     #region InventoryCard 데이터 추가, 삭제 메서드
-    public void AddOwnedCard(InventoryCard card)
-    {
+    [ServerRpc]
+    public void AddOwnedCardServerRpc(InventoryCard card)
+    {   
         if (ownedCards.Value.Count >= maxCardCount)
         {
             Debug.Log("카드 추가 실패: 인벤토리 가득 참");
@@ -61,7 +62,8 @@ public class CardInventoryModel : NetworkBehaviour
         Debug.Log($"[CardInventoryModel] 카드 추가 성공: {card.CardID}");
     }
 
-    public void RemoveOwnedCard(int cardItemId)
+    [ServerRpc]
+    public void RemoveOwnedCardServerRpc(int cardItemId)
     {
         for (int i = 0; i < ownedCards.Value.Count; i++)
         {

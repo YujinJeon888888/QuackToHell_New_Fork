@@ -343,7 +343,7 @@ public class DeckManager : NetworkBehaviour
         updatedCard.AcquiredTicks = DateTime.Now.Ticks;
 
         // 해당 플레이어 인벤토리에 카드 추가
-        PlayerHelperManager.Instance.GetPlayerGameObjectByClientId(clientId)?.GetComponent<CardInventoryModel>().AddOwnedCard(updatedCard);
+        PlayerHelperManager.Instance.GetPlayerGameObjectByClientId(clientId)?.GetComponent<CardInventoryModel>().AddOwnedCardServerRpc(updatedCard);
 
         //해당 carditemid에 대한 CardForSale 프리팹에 대해서 sold상태로 전환
         string findCardForSaleString = $"CardForSale_{card.CardItemId}";

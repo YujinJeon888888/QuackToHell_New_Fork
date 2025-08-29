@@ -18,14 +18,16 @@ public sealed class CardShopPresenter : NetworkBehaviour
         _view = viewBehaviour;
         _model = new CardShopModel();
     }
+    private void Start() {
+        _model.DisplayCardsForSale();
+    }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
-        if ( _view != null)
+        if (_view != null)
         {
-            _model.DisplayCardsForSale();
             _view.OnClickLock += OnClickLock;
             _view.OnClickReRoll += OnClickReRoll;
         }

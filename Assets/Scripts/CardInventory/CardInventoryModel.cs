@@ -55,7 +55,9 @@ public class CardInventoryModel : NetworkBehaviour
             Debug.Log("카드 추가 실패: 인벤토리 가득 참");
             return;
         }
-        ownedCards.Value.Add(card);
+        List<InventoryCard> newList = new List<InventoryCard>(ownedCards.Value);
+        newList.Add(card);
+        ownedCards.Value = newList;
         Debug.Log($"[CardInventoryModel] 카드 추가 성공: {card.CardID}");
     }
 
@@ -65,7 +67,9 @@ public class CardInventoryModel : NetworkBehaviour
         {
             if (ownedCards.Value[i].Status.CardItemID == cardItemId)
             {
-                ownedCards.Value.RemoveAt(i);
+                List<InventoryCard> newList = new List<InventoryCard>(ownedCards.Value);
+                newList.RemoveAt(i);
+                ownedCards.Value = newList;
                 break;
             }
         }

@@ -841,6 +841,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lockButton: {fileID: 2862873183265326473}
   rerollButton: {fileID: 9116654684364519791}
+  cardShopPanel: {fileID: 4666795161831703014}
 --- !u!95 &189553553727767220
 Animator:
   serializedVersion: 7

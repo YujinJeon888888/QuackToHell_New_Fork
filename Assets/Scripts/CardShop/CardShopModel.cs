@@ -71,7 +71,6 @@ public sealed class CardShopModel
 
         var row = GetRow();
         if (row == null) return;
-        Debug.Log($"[CardShopModel] 카드 진열함수: 부모오브젝트 세팅 완료");
 
         // 기존 카드 다 지우기
         for (int i = row.childCount - 1; i >= 0; i--)
@@ -79,13 +78,22 @@ public sealed class CardShopModel
             Object.Destroy(row.GetChild(i).gameObject);
         }
 
-        // 5개 생성해서 Row 밑으로 붙이기
+        // 5개 생성
         int[] cardIds = { 10000, 20000, 30000, 10100, 20200 };
         for (int i = 0; i < cardIds.Length; i++)
         {
             Debug.Log($"[CardShopModel] 카드 진열함수: 카드 생성");
             CardItemFactory.Instance.CreateCardForSale(cardIds[i], Vector3.zero);
         }
+        
+    }
+    /// <summary>
+    /// 카드들을 Row 오브젝트 밑으로 이동시킵니다.
+    /// </summary>
+    public void MoveCardsForSaleToRowObject()
+    {
+        var row = GetRow();
+        if (row == null) return;
 
         // 스폰된 카드들을 전부 Row 밑으로 이동
         var spawned = GameObject.FindGameObjectsWithTag("CardForSale");

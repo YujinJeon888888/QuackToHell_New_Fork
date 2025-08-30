@@ -32,7 +32,7 @@ public sealed class CardShopModel
         if (IsLocked) return false;
 
         // 새로 뿌리기
-        DisplayCardsForSale();
+        CreateCardsForSale();
 
         return true;
     }
@@ -60,7 +60,7 @@ public sealed class CardShopModel
         }
         return _row;
     }
-    public void DisplayCardsForSale()
+    public void CreateCardsForSale()
     {
         Debug.Log($"[CardShopModel] 카드 진열함수 들어옴");
         if (IsLocked)
